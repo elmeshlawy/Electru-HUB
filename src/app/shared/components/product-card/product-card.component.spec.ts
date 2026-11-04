@@ -23,6 +23,9 @@ const mockProduct: Product = {
   featuredImage: 'https://example.com/test.jpg',
   images: ['https://example.com/test.jpg'],
   specs: {},
+  specifications: {},
+  featured: true,
+  bestSeller: true,
   createdAt: '2026-01-01',
 };
 

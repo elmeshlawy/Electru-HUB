@@ -33,7 +33,7 @@
     </button>
 
     <!-- Product Image -->
-    <a [routerLink]="['/products', product().slug]" class="d-block text-center product-image-link p-4">
+    <a [routerLink]="['/products', product().id]" class="d-block text-center product-image-link p-4">
       <img
         [src]="product().featuredImage"
         [alt]="product().name"
@@ -54,7 +54,7 @@
 
     <!-- Product Name -->
     <h3 class="product-title mb-2">
-      <a [routerLink]="['/products', product().slug]" class="text-navy text-decoration-none" [title]="product().name">
+      <a [routerLink]="['/products', product().id]" class="text-navy text-decoration-none" [title]="product().name">
         {{ product().name }}
       </a>
     </h3>

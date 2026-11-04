@@ -40,20 +40,20 @@ export class OrderService {
           customerName: 'Alex Vance',
           items: [
             {
-              productId: 'prod-macbook-pro-m3',
-              productName: 'Apex Pro 16" Ultra Studio',
+              productId: 'prod-macbook-pro-16',
+              productName: 'Apple MacBook Pro 16" M3 Max',
               productImage: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80',
-              unitPrice: 2499.99,
+              unitPrice: 3499.00,
               quantity: 1,
-              lineTotal: 2499.99,
+              lineTotal: 3499.00,
             },
             {
-              productId: 'prod-soundwave-pro-anc',
-              productName: 'AuraStudio Studio Wireless ANC Headphones',
+              productId: 'prod-sony-wh1000xm5',
+              productName: 'Sony WH-1000XM5 Wireless ANC',
               productImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80',
-              unitPrice: 349.99,
+              unitPrice: 348.00,
               quantity: 1,
-              lineTotal: 349.99,
+              lineTotal: 348.00,
             },
           ],
           shippingAddress: {

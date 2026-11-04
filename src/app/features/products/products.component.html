@@ -1,6 +1,6 @@
 <div class="products-page py-4">
   <div class="container-xl">
-    <!-- Breadcrumb & Title -->
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -8,121 +8,313 @@
       </ol>
     </nav>
 
+    <!-- Page Header & Top Toolbar -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
       <div>
-        <h1 class="h3 fw-bold text-navy mb-1">Electronics & Devices Catalog</h1>
+        <h1 class="h2 fw-bold text-navy mb-1">Electronics & Devices Catalog</h1>
         <p class="text-muted text-sm mb-0">
-          Showing <span class="fw-bold text-navy">{{ filteredProducts().length }}</span> products available
+          Showing <span class="fw-bold text-navy">{{ paginatedProducts().length }}</span> of <span class="fw-bold text-navy">{{ totalProductsCount() }}</span> products
         </p>
       </div>
 
-      <!-- Sort Dropdown -->
-      <div class="d-flex align-items-center gap-2">
-        <label for="sortBySelect" class="text-xs text-muted text-nowrap fw-semibold">Sort By:</label>
-        <select
-          id="sortBySelect"
-          class="form-select form-select-sm sort-select"
-          [value]="sortBy()"
-          (change)="onSortChange($event)"
-        >
-          <option value="newest">Newest Arrivals</option>
-          <option value="rating">Customer Rating</option>
-          <option value="price-asc">Price: Low to High</option>
-          <option value="price-desc">Price: High to Low</option>
-          <option value="name">Name: A to Z</option>
-        </select>
+      <!-- Search & Sort Row -->
+      <div class="d-flex flex-wrap align-items-center gap-3">
+        <!-- Search bar inside catalog toolbar -->
+        <div class="input-group catalog-search-input shadow-xs">
+          <span class="input-group-text bg-white border-end-0 text-muted ps-3">
+            <i class="bi bi-search"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control border-start-0 ps-1 py-2 text-sm"
+            placeholder="Search by name, brand..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+          />
+          @if (searchQuery()) {
+            <button class="btn btn-outline-secondary border-start-0 bg-white" type="button" (click)="searchQuery.set(''); onSearchChange()">
+              <i class="bi bi-x-lg text-xs"></i>
+            </button>
+          }
+        </div>
+
+        <!-- Sort Select -->
+        <div class="d-flex align-items-center gap-2">
+          <label for="sortBySelect" class="text-xs text-muted text-nowrap fw-semibold">Sort By:</label>
+          <select
+            id="sortBySelect"
+            class="form-select form-select-sm sort-select py-2 shadow-xs"
+            [value]="sortBy()"
+            (change)="onSortChange($event)"
+          >
+            <option value="newest">Newest Arrivals</option>
+            <option value="rating">Highest Rated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name">Product Name: A - Z</option>
+          </select>
+        </div>
       </div>
     </div>
 
+    <!-- 9. Active Filter Indicators & 10. Clear All Filters -->
+    @if (hasActiveFilters()) {
+      <div class="active-filters-bar bg-white p-3 rounded-3 border mb-4 d-flex flex-wrap align-items-center justify-content-between gap-2 shadow-xs">
+        <div class="d-flex flex-wrap align-items-center gap-2">
+          <span class="text-xs text-muted fw-bold text-uppercase me-1"><i class="bi bi-funnel-fill me-1"></i> Active Filters:</span>
+          @for (chip of activeFilters(); track chip.id) {
+            <span class="badge active-filter-chip d-inline-flex align-items-center gap-1 py-1 px-2.5">
+              <span>{{ chip.label }}</span>
+              <button
+                type="button"
+                class="btn-close btn-close-white text-xs ms-1 filter-close-btn"
+                (click)="removeFilter(chip)"
+                aria-label="Remove filter"
+              ></button>
+            </span>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="btn btn-link btn-sm text-danger text-decoration-none p-0 text-xs fw-semibold"
+          (click)="clearAllFilters()"
+        >
+          <i class="bi bi-trash3 me-1"></i> Clear All Filters
+        </button>
+      </div>
+    }
+
     <div class="row g-4">
-      <!-- Sidebar Filters -->
+      <!-- Sidebar Filters Column -->
       <aside class="col-12 col-lg-3">
-        <div class="filter-card bg-white p-4 rounded-3 border shadow-xs sticky-top" style="top: 100px;">
+        <div class="filter-card bg-white p-4 rounded-4 border shadow-xs sticky-top" style="top: 100px;">
           <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-            <h6 class="fw-bold text-navy mb-0"><i class="bi bi-funnel me-1"></i> Filters</h6>
-            <button class="btn btn-link btn-sm text-primary-blue text-decoration-none p-0 text-xs" (click)="clearFilters()">
-              Reset All
-            </button>
+            <h5 class="fw-bold text-navy mb-0 fs-6"><i class="bi bi-sliders me-2 text-primary-blue"></i> Refine Search</h5>
+            @if (hasActiveFilters()) {
+              <button class="btn btn-link btn-sm text-primary-blue text-decoration-none p-0 text-xs fw-semibold" (click)="clearAllFilters()">
+                Reset
+              </button>
+            }
           </div>
 
-          <!-- Category Filter -->
+          <!-- 3. Category Filter -->
           <div class="filter-group mb-4">
-            <div class="filter-heading fw-semibold text-xs text-uppercase text-muted mb-2">Category</div>
+            <div class="filter-heading fw-bold text-xs text-uppercase text-muted mb-2 tracking-wider">Department</div>
             <div class="d-flex flex-column gap-1">
               <button
                 type="button"
-                class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded"
+                class="filter-option-btn text-start border-0 bg-transparent py-1.5 px-2 rounded-2 text-sm d-flex justify-content-between align-items-center"
                 [class.active]="selectedCategory() === ''"
                 (click)="onCategorySelect('')"
               >
-                All Categories
+                <span>All Departments</span>
+                <span class="badge bg-light text-navy text-xs">{{ productService.products().length }}</span>
               </button>
               @for (cat of categories(); track cat.id) {
                 <button
                   type="button"
-                  class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded d-flex justify-content-between align-items-center"
+                  class="filter-option-btn text-start border-0 bg-transparent py-1.5 px-2 rounded-2 text-sm d-flex justify-content-between align-items-center"
                   [class.active]="selectedCategory() === cat.id"
                   (click)="onCategorySelect(cat.id)"
                 >
-                  <span>{{ cat.name }}</span>
-                  <span class="badge bg-light text-muted text-xs">{{ cat.productCount }}</span>
+                  <span class="d-flex align-items-center gap-2">
+                    <i class="bi" [class]="cat.icon ?? 'bi-box'"></i>
+                    {{ cat.name }}
+                  </span>
+                  <span class="badge bg-light text-navy text-xs">{{ cat.productCount }}</span>
                 </button>
               }
             </div>
           </div>
 
-          <!-- Brand Filter -->
+          <!-- 4. Brand Filter -->
           <div class="filter-group mb-4">
-            <div class="filter-heading fw-semibold text-xs text-uppercase text-muted mb-2">Brand</div>
-            <div class="d-flex flex-column gap-1">
-              @for (b of brands(); track b) {
+            <div class="filter-heading fw-bold text-xs text-uppercase text-muted mb-2 tracking-wider">Brand</div>
+            <div class="brand-scroll-list d-flex flex-column gap-1 pe-1" style="max-height: 190px; overflow-y: auto;">
+              @for (b of availableBrands(); track b) {
                 <button
                   type="button"
-                  class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded"
+                  class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded-2 text-sm d-flex justify-content-between align-items-center"
                   [class.active]="selectedBrand() === b"
                   (click)="onBrandSelect(b)"
                 >
-                  {{ b }}
+                  <span>{{ b }}</span>
+                  @if (selectedBrand() === b) {
+                    <i class="bi bi-check2 text-primary-blue fw-bold"></i>
+                  }
                 </button>
               }
             </div>
           </div>
 
-          <!-- In Stock Only Toggle -->
-          <div class="form-check form-switch pt-2 border-top">
+          <!-- 5. Min / Max Price Filter -->
+          <div class="filter-group mb-4">
+            <div class="filter-heading fw-bold text-xs text-uppercase text-muted mb-2 tracking-wider">Price Range ($)</div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                placeholder="Min"
+                [(ngModel)]="minPrice"
+                min="0"
+              />
+              <span class="text-muted text-xs">&ndash;</span>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                placeholder="Max"
+                [(ngModel)]="maxPrice"
+                min="0"
+              />
+            </div>
+            <button
+              type="button"
+              class="btn btn-outline-navy btn-sm w-100 py-1 text-xs fw-semibold"
+              (click)="onPriceFilterApply()"
+            >
+              Apply Range
+            </button>
+          </div>
+
+          <!-- 6. Rating Filter -->
+          <div class="filter-group mb-4">
+            <div class="filter-heading fw-bold text-xs text-uppercase text-muted mb-2 tracking-wider">Customer Rating</div>
+            <div class="d-flex flex-column gap-1">
+              <button
+                type="button"
+                class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded-2 text-sm d-flex align-items-center gap-2"
+                [class.active]="minRating() === 4.8"
+                (click)="onRatingSelect(4.8)"
+              >
+                <div class="text-warning text-xs">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                </div>
+                <span>4.8 & Above</span>
+              </button>
+              <button
+                type="button"
+                class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded-2 text-sm d-flex align-items-center gap-2"
+                [class.active]="minRating() === 4.5"
+                (click)="onRatingSelect(4.5)"
+              >
+                <div class="text-warning text-xs">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                </div>
+                <span>4.5 & Above</span>
+              </button>
+              <button
+                type="button"
+                class="filter-option-btn text-start border-0 bg-transparent py-1 px-2 rounded-2 text-sm d-flex align-items-center gap-2"
+                [class.active]="minRating() === 4.0"
+                (click)="onRatingSelect(4.0)"
+              >
+                <div class="text-warning text-xs">
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star-fill"></i>
+                  <i class="bi bi-star"></i>
+                </div>
+                <span>4.0 & Above</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Stock Availability Switch -->
+          <div class="form-check form-switch pt-3 border-top mb-0">
             <input
               class="form-check-input"
               type="checkbox"
               role="switch"
-              id="inStockSwitch"
+              id="catalogStockSwitch"
               [checked]="inStockOnly()"
-              (change)="inStockOnly.set(!inStockOnly())"
+              (change)="onStockToggle()"
             />
-            <label class="form-check-label text-sm fw-medium" for="inStockSwitch">
+            <label class="form-check-label text-sm fw-semibold text-navy" for="catalogStockSwitch">
               In Stock Only
             </label>
           </div>
         </div>
       </aside>
 
-      <!-- Products Grid -->
+      <!-- 1. Responsive Product Grid Column -->
       <main class="col-12 col-lg-9">
-        @if (filteredProducts().length > 0) {
+        @if (paginatedProducts().length > 0) {
           <div class="row g-4">
-            @for (product of filteredProducts(); track product.id) {
+            @for (product of paginatedProducts(); track product.id) {
               <div class="col-12 col-sm-6 col-xl-4">
                 <app-product-card [product]="product"></app-product-card>
               </div>
             }
           </div>
+
+          <!-- 8. Pagination Navigation Bar -->
+          @if (totalPages() > 1) {
+            <nav aria-label="Catalog Pagination" class="mt-5 d-flex justify-content-center">
+              <ul class="pagination pagination-md shadow-xs">
+                <!-- Previous Button -->
+                <li class="page-item" [class.disabled]="currentPage() === 1">
+                  <button
+                    type="button"
+                    class="page-link"
+                    (click)="prevPage()"
+                    [disabled]="currentPage() === 1"
+                    aria-label="Previous"
+                  >
+                    <i class="bi bi-chevron-left me-1"></i> Prev
+                  </button>
+                </li>
+
+                <!-- Page Number Buttons -->
+                @for (p of getPageNumbers(); track p) {
+                  <li class="page-item" [class.active]="currentPage() === p">
+                    <button
+                      type="button"
+                      class="page-link"
+                      (click)="goToPage(p)"
+                    >
+                      {{ p }}
+                    </button>
+                  </li>
+                }
+
+                <!-- Next Button -->
+                <li class="page-item" [class.disabled]="currentPage() === totalPages()">
+                  <button
+                    type="button"
+                    class="page-link"
+                    (click)="nextPage()"
+                    [disabled]="currentPage() === totalPages()"
+                    aria-label="Next"
+                  >
+                    Next <i class="bi bi-chevron-right ms-1"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="text-center text-xs text-muted mt-2">
+              Page {{ currentPage() }} of {{ totalPages() }} ({{ totalProductsCount() }} total items)
+            </div>
+          }
         } @else {
-          <div class="bg-white rounded-3 border p-5">
+          <!-- Empty Results State -->
+          <div class="bg-white rounded-4 border p-5 shadow-xs">
             <app-empty-state
-              icon="bi-search"
-              title="No products matched your criteria"
-              description="Try adjusting or resetting your category, brand filters, or search term."
-              actionText="Reset Filters"
-              (actionClicked)="clearFilters()"
+              icon="bi-funnel-x"
+              title="No Products Matched Your Criteria"
+              description="We couldn't find any devices matching your selected category, brand, price range, or search keyword."
+              actionText="Reset All Filters"
+              (actionClicked)="clearAllFilters()"
             ></app-empty-state>
           </div>
         }

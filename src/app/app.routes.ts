@@ -17,7 +17,7 @@ export const routes: Routes = [
     title: 'Products Catalog | ElectroHub',
   },
   {
-    path: 'products/:slug',
+    path: 'products/:id',
     loadComponent: () =>
       import('./features/product-details/product-details.component').then(
         (m) => m.ProductDetailsComponent
