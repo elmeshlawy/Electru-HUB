@@ -1,5 +1,6 @@
 <div class="cart-page py-4">
   <div class="container-xl">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -7,19 +8,63 @@
       </ol>
     </nav>
 
-    <h1 class="h3 fw-bold text-navy mb-4">Shopping Cart</h1>
+    <!-- Page Title & Header Info -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 fw-bold text-navy mb-1">Shopping Cart</h1>
+        @if (!isEmpty()) {
+          <p class="text-muted text-sm mb-0">
+            You have <strong class="text-navy">{{ totalItems() }}</strong> item(s) in your cart
+          </p>
+        }
+      </div>
+      @if (!isEmpty()) {
+        <a routerLink="/products" class="btn btn-outline-navy btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Continue Shopping
+        </a>
+      }
+    </div>
+
+    <!-- Feedback Message Banner -->
+    @if (feedbackMessage(); as msg) {
+      <div
+        class="alert alert-dismissible fade show d-flex align-items-center gap-2 mb-4 py-2 px-3 shadow-xs"
+        [class.alert-success]="msg.type === 'success'"
+        [class.alert-warning]="msg.type === 'warning'"
+        [class.alert-info]="msg.type === 'info'"
+        role="alert"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="msg.type === 'success'"
+          [class.bi-exclamation-triangle-fill]="msg.type === 'warning'"
+          [class.bi-info-circle-fill]="msg.type === 'info'"
+        ></i>
+        <div class="text-sm fw-medium">{{ msg.text }}</div>
+        <button
+          type="button"
+          class="btn-close py-2"
+          (click)="feedbackMessage.set(null)"
+          aria-label="Close"
+        ></button>
+      </div>
+    }
 
     @if (!isEmpty()) {
       <div class="row g-4">
-        <!-- Cart Items List -->
+        <!-- Cart Items Column -->
         <div class="col-12 col-lg-8">
           <!-- Free Shipping Progress -->
           <div class="card p-3 mb-4 bg-white border rounded-3 shadow-xs">
             <div class="d-flex justify-content-between align-items-center text-xs mb-2">
               @if (freeShippingRemaining() > 0) {
-                <span>Add <strong class="text-primary-blue">{{ freeShippingRemaining() | currencyFormat }}</strong> more for Free Express Shipping!</span>
+                <span>
+                  Add <strong class="text-primary-blue">{{ freeShippingRemaining() | currencyFormat }}</strong> more for <strong>Free Express Shipping</strong>!
+                </span>
               } @else {
-                <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i> You've unlocked Free Express Shipping!</span>
+                <span class="text-success fw-bold">
+                  <i class="bi bi-check-circle-fill me-1"></i> You've unlocked Free Express Shipping!
+                </span>
               }
               <span class="fw-bold">{{ freeShippingPercentage() }}%</span>
             </div>
@@ -28,21 +73,24 @@
                 class="progress-bar bg-primary-blue"
                 role="progressbar"
                 [style.width.%]="freeShippingPercentage()"
+                [attr.aria-valuenow]="freeShippingPercentage()"
+                aria-valuemin="0"
+                aria-valuemax="100"
               ></div>
             </div>
           </div>
 
-          <!-- Items Table / Cards -->
+          <!-- Items Table Card -->
           <div class="card bg-white border rounded-3 overflow-hidden shadow-xs">
             <div class="table-responsive">
               <table class="table align-middle mb-0">
                 <thead class="bg-light text-muted text-xs text-uppercase">
                   <tr>
                     <th scope="col" class="py-3 px-4">Product</th>
-                    <th scope="col" class="py-3 px-3 text-center">Unit Price</th>
+                    <th scope="col" class="py-3 px-3 text-center">Price</th>
                     <th scope="col" class="py-3 px-3 text-center">Quantity</th>
                     <th scope="col" class="py-3 px-3 text-end">Total</th>
-                    <th scope="col" class="py-3 px-3 text-center">Action</th>
+                    <th scope="col" class="py-3 px-3 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -51,18 +99,29 @@
                       <!-- Product Details -->
                       <td class="py-3 px-4">
                         <div class="d-flex align-items-center gap-3">
-                          <img
-                            [src]="item.product.featuredImage"
-                            [alt]="item.product.name"
-                            class="cart-thumb rounded border"
-                          />
+                          <a [routerLink]="['/products', item.product.id]" class="d-shrink-0">
+                            <img
+                              [src]="item.product.featuredImage"
+                              [alt]="item.product.name"
+                              class="cart-thumb rounded border"
+                            />
+                          </a>
                           <div>
                             <span class="badge bg-light text-muted text-xs mb-1">{{ item.product.brand }}</span>
-                            <h6 class="mb-0 fw-semibold">
-                              <a [routerLink]="['/products', item.product.slug]" class="text-navy text-decoration-none">
+                            <h6 class="mb-1 fw-semibold text-sm">
+                              <a [routerLink]="['/products', item.product.id]" class="text-navy text-decoration-none hover-blue">
                                 {{ item.product.name }}
                               </a>
                             </h6>
+                            <div class="text-xs text-muted">
+                              @if (item.product.stock <= 5) {
+                                <span class="badge bg-warning-subtle text-warning-emphasis">
+                                  Only {{ item.product.stock }} left in stock
+                                </span>
+                              } @else {
+                                <span class="text-success"><i class="bi bi-check2"></i> In Stock</span>
+                              }
+                            </div>
                           </div>
                         </div>
                       </td>
@@ -74,24 +133,41 @@
 
                       <!-- Quantity Controls -->
                       <td class="py-3 px-3 text-center">
-                        <div class="d-inline-flex align-items-center border rounded bg-light">
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-link text-navy text-decoration-none px-2"
-                            (click)="updateQuantity(item.id, item.quantity, -1)"
-                            [disabled]="item.quantity <= 1"
-                          >
-                            <i class="bi bi-dash"></i>
-                          </button>
-                          <span class="px-2 fw-semibold text-sm">{{ item.quantity }}</span>
-                          <button
-                            type="button"
-                            class="btn btn-sm btn-link text-navy text-decoration-none px-2"
-                            (click)="updateQuantity(item.id, item.quantity, 1)"
-                            [disabled]="item.quantity >= item.product.stock"
-                          >
-                            <i class="bi bi-plus"></i>
-                          </button>
+                        <div class="d-inline-flex flex-column align-items-center">
+                          <div class="d-inline-flex align-items-center border rounded bg-white shadow-xs">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-link text-navy text-decoration-none px-2 py-1 qty-btn"
+                              (click)="decrement(item.id)"
+                              [disabled]="item.quantity <= 1"
+                              title="Decrease quantity"
+                              aria-label="Decrease quantity"
+                            >
+                              <i class="bi bi-dash"></i>
+                            </button>
+                            <input
+                              type="number"
+                              min="1"
+                              [max]="item.product.stock"
+                              [value]="item.quantity"
+                              (change)="onQuantityInputChange(item.id, $event, item.product.stock)"
+                              class="form-control form-control-sm text-center border-0 fw-semibold qty-input"
+                              aria-label="Item quantity"
+                            />
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-link text-navy text-decoration-none px-2 py-1 qty-btn"
+                              (click)="increment(item.id)"
+                              [disabled]="item.quantity >= item.product.stock"
+                              title="Increase quantity"
+                              aria-label="Increase quantity"
+                            >
+                              <i class="bi bi-plus"></i>
+                            </button>
+                          </div>
+                          @if (item.quantity >= item.product.stock) {
+                            <span class="text-xs text-danger mt-1">Max stock</span>
+                          }
                         </div>
                       </td>
 
@@ -100,16 +176,28 @@
                         {{ item.totalPrice | currencyFormat }}
                       </td>
 
-                      <!-- Remove Action -->
+                      <!-- Actions: Move to Wishlist & Remove -->
                       <td class="py-3 px-3 text-center">
-                        <button
-                          type="button"
-                          class="btn btn-sm text-danger border-0 bg-transparent"
-                          (click)="removeItem(item.id)"
-                          title="Remove item"
-                        >
-                          <i class="bi bi-trash"></i>
-                        </button>
+                        <div class="d-flex align-items-center justify-content-center gap-1">
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-light border-0 text-muted hover-red"
+                            (click)="moveToWishlist(item.product, item.id)"
+                            title="Save for Later (Move to Wishlist)"
+                            aria-label="Save for later"
+                          >
+                            <i class="bi bi-heart"></i>
+                          </button>
+                          <button
+                            type="button"
+                            class="btn btn-sm btn-light border-0 text-danger hover-darkred"
+                            (click)="removeItem(item.id)"
+                            title="Remove item"
+                            aria-label="Remove item"
+                          >
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   }
@@ -117,66 +205,117 @@
               </table>
             </div>
 
-            <div class="p-3 bg-light border-top d-flex justify-content-between align-items-center">
+            <!-- Table Footer Actions -->
+            <div class="p-3 bg-light border-top d-flex flex-wrap justify-content-between align-items-center gap-2">
               <a routerLink="/products" class="btn btn-outline-navy btn-sm">
                 <i class="bi bi-arrow-left me-1"></i> Continue Shopping
               </a>
-              <button type="button" class="btn btn-link btn-sm text-danger text-decoration-none" (click)="clearCart()">
-                Clear Shopping Cart
+              <button
+                type="button"
+                class="btn btn-link btn-sm text-danger text-decoration-none"
+                (click)="clearCart()"
+              >
+                <i class="bi bi-trash3 me-1"></i> Clear Shopping Cart
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Order Summary Card -->
+        <!-- Order Summary Column -->
         <div class="col-12 col-lg-4">
           <div class="card bg-white p-4 border rounded-3 shadow-xs sticky-top" style="top: 100px;">
             <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">Order Summary</h5>
 
+            <!-- Subtotal -->
             <div class="d-flex justify-content-between text-sm mb-2">
-              <span class="text-muted">Subtotal ({{ summary().totalItems }} items)</span>
-              <span class="fw-semibold text-navy">{{ summary().subtotal | currencyFormat }}</span>
+              <span class="text-muted">Subtotal ({{ totalItems() }} items)</span>
+              <span class="fw-semibold text-navy">{{ subtotal() | currencyFormat }}</span>
             </div>
 
+            <!-- Shipping -->
             <div class="d-flex justify-content-between text-sm mb-2">
               <span class="text-muted">Estimated Shipping</span>
-              @if (summary().shipping === 0) {
+              @if (shipping() === 0) {
                 <span class="text-success fw-bold">FREE</span>
               } @else {
-                <span class="fw-semibold text-navy">{{ summary().shipping | currencyFormat }}</span>
+                <span class="fw-semibold text-navy">{{ shipping() | currencyFormat }}</span>
               }
             </div>
 
+            <!-- Tax -->
             <div class="d-flex justify-content-between text-sm mb-3">
               <span class="text-muted">Estimated Tax (8%)</span>
-              <span class="fw-semibold text-navy">{{ summary().tax | currencyFormat }}</span>
+              <span class="fw-semibold text-navy">{{ tax() | currencyFormat }}</span>
             </div>
 
+            <!-- Grand Total -->
             <div class="d-flex justify-content-between align-items-center pt-3 border-top mb-4">
-              <span class="fw-bold fs-5 text-navy">Total</span>
-              <span class="fw-extrabold fs-4 text-primary-blue">{{ summary().total | currencyFormat }}</span>
+              <div>
+                <span class="fw-bold fs-5 text-navy">Total</span>
+                <span class="d-block text-xs text-muted">Including Tax & Shipping</span>
+              </div>
+              <span class="fw-extrabold fs-4 text-primary-blue">{{ totalPrice() | currencyFormat }}</span>
             </div>
 
-            <a routerLink="/checkout" class="btn btn-primary-blue btn-lg w-100 mb-3">
-              Proceed To Checkout <i class="bi bi-arrow-right ms-1"></i>
+            <!-- Proceed to Checkout Button -->
+            <a routerLink="/checkout" class="btn btn-primary-blue btn-lg w-100 mb-3 d-flex align-items-center justify-content-center gap-2">
+              <span>Proceed to Checkout</span>
+              <i class="bi bi-arrow-right"></i>
             </a>
 
-            <div class="text-center text-xs text-muted d-flex align-items-center justify-content-center gap-2">
-              <i class="bi bi-shield-lock-fill text-success fs-6"></i>
-              <span>Guaranteed 256-Bit SSL Encrypted Checkout</span>
+            <!-- Trust Features -->
+            <div class="pt-3 border-top text-xs text-muted d-flex flex-column gap-2">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-lock-fill text-success fs-6"></i>
+                <span>Guaranteed 256-Bit SSL Encrypted Checkout</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-truck text-primary-blue fs-6"></i>
+                <span>Fast express delivery directly to your door</span>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-arrow-counterclockwise text-navy fs-6"></i>
+                <span>30-Day Hassle-Free Returns & Replacements</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
     } @else {
-      <div class="bg-white rounded-3 border p-5">
+      <!-- Empty Cart State -->
+      <div class="card bg-white rounded-3 border p-5 text-center shadow-xs">
         <app-empty-state
           icon="bi-bag-x"
-          title="Your Cart is Empty"
-          description="Explore our selection of flagship computers, acoustics, and smart gear to start filling it up."
-          actionText="Start Shopping"
+          title="Your Shopping Cart is Empty"
+          description="Looks like you haven't added any products yet. Browse our flagship devices, acoustics, and smart gear to start shopping."
+          actionText="Explore All Products"
           actionRoute="/products"
         ></app-empty-state>
+
+        <!-- Quick Category Shortcuts -->
+        <div class="mt-4 pt-4 border-top">
+          <h6 class="text-xs text-uppercase tracking-wider text-muted fw-bold mb-3">Popular Tech Categories</h6>
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a routerLink="/products" [queryParams]="{ category: 'cat-laptops' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-laptop me-1 text-primary-blue"></i> Laptops
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-phone me-1 text-primary-blue"></i> Smartphones
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-headphones' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-headphones me-1 text-primary-blue"></i> Headphones
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-gaming' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-controller me-1 text-primary-blue"></i> Gaming
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-monitors' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-display me-1 text-primary-blue"></i> Monitors
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-smartwatches' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-smartwatch me-1 text-primary-blue"></i> Smart Watches
+            </a>
+          </div>
+        </div>
       </div>
     }
   </div>

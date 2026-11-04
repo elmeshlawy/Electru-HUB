@@ -1,5 +1,6 @@
 <div class="wishlist-page py-4">
   <div class="container-xl">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -7,43 +8,209 @@
       </ol>
     </nav>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header & Action Toolbar -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
       <div>
         <h1 class="h3 fw-bold text-navy mb-1">My Wishlist</h1>
         <p class="text-muted text-sm mb-0">
-          You have <strong class="text-navy">{{ count() }}</strong> saved item(s)
+          You have <strong class="text-navy">{{ count() }}</strong> saved item(s) in your wishlist
         </p>
       </div>
 
       @if (!isEmpty()) {
-        <div class="d-flex gap-2">
-          <button type="button" class="btn btn-primary-blue btn-sm" (click)="addAllToCart()">
-            <i class="bi bi-cart-plus me-1"></i> Add All to Cart
+        <div class="d-flex align-items-center gap-2">
+          <button
+            type="button"
+            class="btn btn-primary-blue btn-sm d-flex align-items-center gap-1"
+            (click)="addAllToCart()"
+          >
+            <i class="bi bi-cart-plus"></i>
+            <span>Add All to Cart</span>
           </button>
-          <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearWishlist()">
-            Clear All
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm"
+            (click)="clearWishlist()"
+          >
+            <i class="bi bi-trash3 me-1"></i> Clear All
           </button>
         </div>
       }
     </div>
 
+    <!-- Feedback Message Banner -->
+    @if (feedbackMessage(); as msg) {
+      <div
+        class="alert alert-dismissible fade show d-flex align-items-center gap-2 mb-4 py-2 px-3 shadow-xs"
+        [class.alert-success]="msg.type === 'success'"
+        [class.alert-warning]="msg.type === 'warning'"
+        [class.alert-info]="msg.type === 'info'"
+        role="alert"
+      >
+        <i
+          class="bi"
+          [class.bi-check-circle-fill]="msg.type === 'success'"
+          [class.bi-exclamation-triangle-fill]="msg.type === 'warning'"
+          [class.bi-info-circle-fill]="msg.type === 'info'"
+        ></i>
+        <div class="text-sm fw-medium">{{ msg.text }}</div>
+        <button
+          type="button"
+          class="btn-close py-2"
+          (click)="feedbackMessage.set(null)"
+          aria-label="Close"
+        ></button>
+      </div>
+    }
+
+    <!-- Wishlist Items Grid -->
     @if (!isEmpty()) {
       <div class="row g-4">
         @for (product of items(); track product.id) {
           <div class="col-12 col-sm-6 col-md-4 col-lg-3">
-            <app-product-card [product]="product"></app-product-card>
+            <div class="card eh-wishlist-card h-100 bg-white border rounded-3 overflow-hidden shadow-xs position-relative d-flex flex-column">
+              <!-- Top Badges & Remove Button -->
+              <div class="position-absolute top-0 start-0 m-2 z-2 d-flex flex-column gap-1">
+                @if (product.discountPercentage && product.discountPercentage > 0) {
+                  <span class="badge badge-sale shadow-xs">
+                    -{{ product.discountPercentage }}%
+                  </span>
+                }
+              </div>
+
+              <button
+                type="button"
+                class="btn-remove-wishlist position-absolute top-0 end-0 m-2 z-2"
+                (click)="removeItem(product.id, product.name)"
+                title="Remove from Wishlist"
+                aria-label="Remove from Wishlist"
+              >
+                <i class="bi bi-x-lg"></i>
+              </button>
+
+              <!-- Product Media -->
+              <a [routerLink]="['/products', product.id]" class="d-block text-center p-3 wishlist-img-wrapper">
+                <img
+                  [src]="product.featuredImage"
+                  [alt]="product.name"
+                  class="img-fluid wishlist-image"
+                  loading="lazy"
+                />
+              </a>
+
+              <!-- Card Body -->
+              <div class="card-body p-3 d-flex flex-column flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="text-xs fw-bold text-uppercase text-muted">{{ product.brand }}</span>
+                  <span class="text-xs text-primary-blue fw-semibold">{{ product.categoryName }}</span>
+                </div>
+
+                <h6 class="card-title fw-semibold text-sm mb-2">
+                  <a [routerLink]="['/products', product.id]" class="text-navy text-decoration-none hover-blue line-clamp-2">
+                    {{ product.name }}
+                  </a>
+                </h6>
+
+                <!-- Rating -->
+                <div class="d-flex align-items-center gap-1 mb-2 text-xs">
+                  <i class="bi bi-star-fill text-warning"></i>
+                  <span class="fw-bold text-navy">{{ product.rating }}</span>
+                  <span class="text-muted">({{ product.reviewCount }})</span>
+                </div>
+
+                <!-- Stock Status -->
+                <div class="text-xs mb-3">
+                  @if (product.stock > 0 && product.inStock !== false) {
+                    <span class="text-success fw-medium">
+                      <i class="bi bi-check-circle-fill me-1"></i> In Stock ({{ product.stock }})
+                    </span>
+                  } @else {
+                    <span class="text-danger fw-medium">
+                      <i class="bi bi-x-circle-fill me-1"></i> Out of Stock
+                    </span>
+                  }
+                </div>
+
+                <!-- Price and Action Buttons (Bottom) -->
+                <div class="mt-auto pt-2 border-top">
+                  <div class="d-flex align-items-baseline gap-2 mb-2">
+                    <span class="fw-bold text-navy fs-6">{{ product.price | currencyFormat }}</span>
+                    @if (product.originalPrice && product.originalPrice > product.price) {
+                      <span class="text-muted text-decoration-line-through text-xs">
+                        {{ product.originalPrice | currencyFormat }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="d-grid gap-1">
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-primary-blue d-flex align-items-center justify-content-center gap-1"
+                      [class.btn-success]="isJustAdded(product.id)"
+                      (click)="addToCart(product)"
+                      [disabled]="product.stock <= 0 || product.inStock === false"
+                    >
+                      @if (isJustAdded(product.id)) {
+                        <i class="bi bi-check-lg"></i>
+                        <span>Added to Cart!</span>
+                      } @else if (isInCart(product.id)) {
+                        <i class="bi bi-cart-check-fill"></i>
+                        <span>In Cart (Add +1)</span>
+                      } @else {
+                        <i class="bi bi-cart-plus"></i>
+                        <span>Add to Cart</span>
+                      }
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-link text-muted text-decoration-none py-0 text-xs"
+                      (click)="moveToCart(product)"
+                      [disabled]="product.stock <= 0 || product.inStock === false"
+                    >
+                      Move to Cart
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         }
       </div>
     } @else {
-      <div class="bg-white rounded-3 border p-5">
+      <!-- Empty Wishlist State -->
+      <div class="card bg-white rounded-3 border p-5 text-center shadow-xs">
         <app-empty-state
           icon="bi-heart"
           title="Your Wishlist is Empty"
-          description="Save flagship items you love to keep an eye on price drops and stock updates."
-          actionText="Browse Tech Catalog"
+          description="Explore our cutting-edge tech catalog and click the heart icon to save items for future reference."
+          actionText="Browse Electronics Catalog"
           actionRoute="/products"
         ></app-empty-state>
+
+        <!-- Quick Category Shortcuts -->
+        <div class="mt-4 pt-4 border-top">
+          <h6 class="text-xs text-uppercase tracking-wider text-muted fw-bold mb-3">Popular Tech Categories</h6>
+          <div class="d-flex flex-wrap justify-content-center gap-2">
+            <a routerLink="/products" [queryParams]="{ category: 'cat-laptops' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-laptop me-1 text-primary-blue"></i> Laptops
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-phone me-1 text-primary-blue"></i> Smartphones
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-headphones' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-headphones me-1 text-primary-blue"></i> Headphones
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-gaming' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-controller me-1 text-primary-blue"></i> Gaming
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-monitors' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-display me-1 text-primary-blue"></i> Monitors
+            </a>
+            <a routerLink="/products" [queryParams]="{ category: 'cat-smartwatches' }" class="btn btn-sm btn-light border">
+              <i class="bi bi-smartwatch me-1 text-primary-blue"></i> Smart Watches
+            </a>
+          </div>
+        </div>
       </div>
     }
   </div>

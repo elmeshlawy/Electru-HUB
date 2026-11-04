@@ -1,9 +1,50 @@
 .cart-thumb {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
-  background-color: #f8fafc;
+  background-color: var(--eh-bg-alt);
   padding: 4px;
+  border-radius: var(--eh-radius-md);
+}
+
+.qty-input {
+  width: 52px;
+  padding: 0.25rem 0.15rem;
+  font-size: 0.875rem;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.qty-input::-webkit-inner-spin-button,
+.qty-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.qty-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.qty-btn {
+  font-size: 0.95rem;
+  line-height: 1;
+}
+
+.qty-btn:hover:not(:disabled) {
+  background-color: var(--eh-slate-100);
+}
+
+.hover-blue:hover {
+  color: var(--eh-blue-600) !important;
+}
+
+.hover-red:hover {
+  color: var(--eh-coral-500) !important;
+  background-color: #fee2e2 !important;
+}
+
+.hover-darkred:hover {
+  background-color: #fee2e2 !important;
 }
 
 .text-navy {
