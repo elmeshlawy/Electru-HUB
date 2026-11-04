@@ -1,0 +1,190 @@
+<div class="product-details-page py-4">
+  <div class="container-xl">
+    @if (product(); as prod) {
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb text-xs">
+          <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
+          <li class="breadcrumb-item"><a routerLink="/products" class="text-decoration-none">Catalog</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ prod.name }}</li>
+        </ol>
+      </nav>
+
+      <!-- Alert Notification on Add to Cart -->
+      @if (addedToast()) {
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center gap-2 mb-4" role="alert">
+          <i class="bi bi-check-circle-fill fs-5"></i>
+          <div>
+            <strong>Added to Cart!</strong> {{ quantity() }}x {{ prod.name }} has been added to your shopping cart.
+            <a routerLink="/cart" class="alert-link ms-2">View Cart</a>
+          </div>
+          <button type="button" class="btn-close" (click)="addedToast.set(false)" aria-label="Close"></button>
+        </div>
+      }
+
+      <div class="row g-5">
+        <!-- Media Gallery -->
+        <div class="col-12 col-lg-6">
+          <div class="product-gallery bg-white p-4 rounded-4 border shadow-xs">
+            <div class="main-image-viewport text-center mb-3 p-4 bg-light rounded-3">
+              <img
+                [src]="prod.images[selectedImageIndex()] || prod.featuredImage"
+                [alt]="prod.name"
+                class="img-fluid main-view-image"
+              />
+            </div>
+
+            <!-- Thumbnails -->
+            @if (prod.images.length > 1) {
+              <div class="d-flex gap-2 justify-content-center">
+                @for (img of prod.images; track $index) {
+                  <button
+                    type="button"
+                    class="thumb-btn p-1 bg-white rounded border"
+                    [class.active]="selectedImageIndex() === $index"
+                    (click)="selectedImageIndex.set($index)"
+                  >
+                    <img [src]="img" [alt]="prod.name" class="img-fluid thumb-img" />
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Product Information & Actions -->
+        <div class="col-12 col-lg-6">
+          <div class="product-info-panel">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="badge bg-light text-primary-blue fw-bold">{{ prod.brand }}</span>
+              <span class="text-muted text-xs">SKU: {{ prod.sku }}</span>
+              @if (prod.inStock) {
+                <span class="badge badge-stock ms-auto"><i class="bi bi-check-circle-fill me-1"></i> In Stock ({{ prod.stock }} units)</span>
+              }
+            </div>
+
+            <h1 class="h2 fw-bold text-navy mb-3">{{ prod.name }}</h1>
+
+            <!-- Ratings -->
+            <div class="d-flex align-items-center gap-2 mb-3">
+              <div class="rating-stars text-warning text-sm">
+                <i class="bi bi-star-fill"></i>
+                <i class="bi bi-star-fill ms-1"></i>
+                <i class="bi bi-star-fill ms-1"></i>
+                <i class="bi bi-star-fill ms-1"></i>
+                <i class="bi bi-star-half ms-1"></i>
+              </div>
+              <span class="fw-bold text-sm text-navy">{{ prod.rating }}</span>
+              <span class="text-muted text-xs">({{ prod.reviewCount }} verified reviews)</span>
+            </div>
+
+            <!-- Pricing -->
+            <div class="pricing-card p-3 rounded-3 bg-white border mb-4 d-flex align-items-baseline gap-3">
+              <span class="fs-2 fw-bold text-navy">{{ prod.price | currencyFormat }}</span>
+              @if (prod.originalPrice && prod.originalPrice > prod.price) {
+                <span class="fs-5 text-muted text-decoration-line-through">
+                  {{ prod.originalPrice | currencyFormat }}
+                </span>
+                <span class="badge badge-sale">
+                  Save {{ prod.discountPercentage }}%
+                </span>
+              }
+            </div>
+
+            <!-- Description -->
+            <p class="text-secondary mb-4 leading-relaxed">
+              {{ prod.description }}
+            </p>
+
+            <!-- Quantity & Cart Actions -->
+            <div class="d-flex flex-wrap align-items-center gap-3 mb-4">
+              <div class="quantity-control d-flex align-items-center border rounded-3 bg-white">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link text-navy text-decoration-none px-3"
+                  (click)="decrementQuantity()"
+                  [disabled]="quantity() <= 1"
+                >
+                  <i class="bi bi-dash"></i>
+                </button>
+                <span class="fw-bold px-2">{{ quantity() }}</span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-link text-navy text-decoration-none px-3"
+                  (click)="incrementQuantity()"
+                  [disabled]="quantity() >= prod.stock"
+                >
+                  <i class="bi bi-plus"></i>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                class="btn btn-primary-blue btn-lg flex-grow-1"
+                (click)="onAddToCart()"
+                [disabled]="!prod.inStock"
+              >
+                <i class="bi bi-bag-plus me-1"></i> Add To Cart
+              </button>
+
+              <button
+                type="button"
+                class="btn btn-outline-navy btn-lg"
+                [class.text-danger]="isInWishlist()"
+                (click)="onToggleWishlist()"
+                [title]="isInWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist'"
+              >
+                <i class="bi" [class.bi-heart-fill]="isInWishlist()" [class.bi-heart]="!isInWishlist()"></i>
+              </button>
+            </div>
+
+            <!-- Value Prop Badges -->
+            <div class="row g-2 border-top pt-4">
+              <div class="col-6">
+                <div class="d-flex align-items-center gap-2 text-xs text-muted">
+                  <i class="bi bi-shield-check fs-5 text-primary-blue"></i>
+                  <span>{{ prod.warranty ?? '2-Year Official Warranty' }}</span>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex align-items-center gap-2 text-xs text-muted">
+                  <i class="bi bi-truck fs-5 text-primary-blue"></i>
+                  <span>Free Express Shipping on this item</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Technical Specifications Section -->
+      @if (specEntries().length > 0) {
+        <section class="mt-5 pt-4 border-top">
+          <h3 class="fw-bold text-navy mb-4">Technical Specifications</h3>
+          <div class="bg-white rounded-3 border overflow-hidden">
+            <table class="table table-striped mb-0 text-sm">
+              <tbody>
+                @for (entry of specEntries(); track entry[0]) {
+                  <tr>
+                    <th scope="row" class="w-25 text-navy fw-semibold py-3 px-4">{{ entry[0] }}</th>
+                    <td class="text-secondary py-3 px-4">{{ entry[1] }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      }
+    } @else {
+      <div class="bg-white rounded-3 border p-5 mt-4">
+        <app-empty-state
+          icon="bi-exclamation-circle"
+          title="Product not found"
+          description="The requested device or tech product could not be located in our catalog."
+          actionText="Back to Products"
+          actionRoute="/products"
+        ></app-empty-state>
+      </div>
+    }
+  </div>
+</div>

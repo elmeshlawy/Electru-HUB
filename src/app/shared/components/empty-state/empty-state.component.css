@@ -1,0 +1,20 @@
+.empty-icon-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--eh-blue-50);
+  color: var(--eh-blue-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  border: 1px solid var(--eh-blue-100);
+}
+
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.max-w-450 {
+  max-width: 450px;
+}

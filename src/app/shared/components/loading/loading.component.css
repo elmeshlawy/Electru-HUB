@@ -1,0 +1,29 @@
+.eh-loading-wrapper {
+  min-height: 200px;
+}
+
+.eh-loading-wrapper.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 1050;
+  min-height: 100vh;
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600) !important;
+}
+
+.spinner-lg {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-width: 0.3em;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}

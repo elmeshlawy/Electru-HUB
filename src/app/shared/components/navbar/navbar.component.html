@@ -1,0 +1,271 @@
+<!-- Top Announcement Bar -->
+<div class="eh-topbar py-1 px-3 d-none d-md-block">
+  <div class="container-xl d-flex justify-content-between align-items-center text-xs">
+    <div class="d-flex align-items-center gap-3">
+      <span><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Special Offer: Free Express Shipping over $150</span>
+      <span class="text-white-50">|</span>
+      <span><i class="bi bi-shield-check text-info me-1"></i> 2-Year Official Warranty Guaranteed</span>
+    </div>
+    <div class="d-flex align-items-center gap-3 text-white-50">
+      <a routerLink="/orders" class="topbar-link"><i class="bi bi-truck me-1"></i> Track Order</a>
+      <span>|</span>
+      <a routerLink="/profile" class="topbar-link"><i class="bi bi-question-circle me-1"></i> Support</a>
+    </div>
+  </div>
+</div>
+
+<!-- Main Sticky Header -->
+<header class="navbar-wrapper sticky-top">
+  <nav class="navbar navbar-expand-lg bg-white border-bottom py-3">
+    <div class="container-xl">
+      <!-- Brand Logo -->
+      <a class="navbar-brand d-flex align-items-center gap-2 fw-bold fs-4 text-decoration-none" routerLink="/" (click)="closeMobileMenu()">
+        <span class="brand-icon-box">
+          <i class="bi bi-cpu-fill"></i>
+        </span>
+        <span class="brand-text">Electro<span class="text-primary-blue">Hub</span></span>
+      </a>
+
+      <!-- Mobile Toggle Button -->
+      <button
+        class="navbar-toggler border-0 shadow-none p-1"
+        type="button"
+        (click)="toggleMobileMenu()"
+        aria-label="Toggle navigation"
+      >
+        <i class="bi" [class.bi-list]="!isMobileMenuOpen()" [class.bi-x-lg]="isMobileMenuOpen()" style="font-size: 1.5rem;"></i>
+      </button>
+
+      <!-- Center Search Bar (Desktop) -->
+      <div class="d-none d-lg-flex flex-grow-1 mx-4 max-w-550">
+        <form class="w-100 position-relative" (submit)="onSearch($event)">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0 text-muted ps-3">
+              <i class="bi bi-search"></i>
+            </span>
+            <input
+              type="text"
+              class="form-control bg-light border-start-0 py-2 ps-1"
+              placeholder="Search laptops, flagships, audio, gaming..."
+              [(ngModel)]="searchQuery"
+              name="search"
+            />
+            <button class="btn btn-primary-blue px-4" type="submit">
+              Search
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Action Icons (Wishlist, Cart, Profile) -->
+      <div class="d-none d-lg-flex align-items-center gap-3">
+        <!-- Wishlist -->
+        <a routerLink="/wishlist" class="action-btn position-relative" title="Wishlist">
+          <i class="bi bi-heart fs-5"></i>
+          @if (wishlistService.count() > 0) {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger action-badge">
+              {{ wishlistService.count() }}
+            </span>
+          }
+          <span class="action-label d-none d-xl-inline ms-1">Wishlist</span>
+        </a>
+
+        <!-- Cart -->
+        <a routerLink="/cart" class="action-btn position-relative" title="Shopping Cart">
+          <i class="bi bi-bag fs-5"></i>
+          @if (cartService.totalItems() > 0) {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary-blue action-badge">
+              {{ cartService.totalItems() }}
+            </span>
+          }
+          <div class="d-none d-xl-flex flex-column text-start ms-1 lh-1">
+            <span class="text-xs text-muted">Cart</span>
+            <span class="fw-bold text-sm text-navy">${{ cartService.subtotal().toFixed(2) }}</span>
+          </div>
+        </a>
+
+        <div class="vr my-2 text-muted"></div>
+
+        <!-- User Authentication -->
+        @if (authService.isAuthenticated()) {
+          <div class="dropdown">
+            <button
+              class="btn btn-user-menu d-flex align-items-center gap-2 dropdown-toggle"
+              type="button"
+              id="userMenuButton"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
+              @if (authService.currentUser()?.avatarUrl) {
+                <img [src]="authService.currentUser()?.avatarUrl" alt="Avatar" class="user-avatar" />
+              } @else {
+                <i class="bi bi-person-circle fs-5 text-primary-blue"></i>
+              }
+              <div class="d-flex flex-column text-start">
+                <span class="fw-semibold text-sm">{{ authService.currentUser()?.firstName }}</span>
+                <span class="text-xs text-muted">Account</span>
+              </div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 p-2" aria-labelledby="userMenuButton">
+              <li>
+                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/profile">
+                  <i class="bi bi-person text-primary-blue"></i> My Profile
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/orders">
+                  <i class="bi bi-box-seam text-primary-blue"></i> Order History
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/wishlist">
+                  <i class="bi bi-heart text-danger"></i> Saved Items
+                </a>
+              </li>
+              <li><hr class="dropdown-divider my-1"></li>
+              <li>
+                <button class="dropdown-item rounded py-2 text-danger d-flex align-items-center gap-2" (click)="onLogout()">
+                  <i class="bi bi-box-arrow-right"></i> Sign Out
+                </button>
+              </li>
+            </ul>
+          </div>
+        } @else {
+          <a routerLink="/auth/login" class="btn btn-primary-blue py-2 px-3">
+            <i class="bi bi-box-arrow-in-right"></i> Sign In
+          </a>
+        }
+      </div>
+    </div>
+  </nav>
+
+  <!-- Secondary Navigation: Categories and Links (Desktop) -->
+  <nav class="sub-nav bg-white border-bottom d-none d-lg-block">
+    <div class="container-xl d-flex align-items-center justify-content-between">
+      <ul class="nav category-nav py-2 gap-1">
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="bi bi-house me-1"></i> Home
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            <i class="bi bi-grid me-1"></i> All Products
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-laptops' }">
+            Laptops & PCs
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }">
+            Smartphones
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-audio' }">
+            Audio & ANC
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-gaming' }">
+            Gaming & VR
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-wearables' }">
+            Wearables
+          </a>
+        </li>
+      </ul>
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-danger-subtle text-danger fw-semibold px-2 py-1">Hot Deals</span>
+        <span class="text-xs text-muted">Up to 40% Off Select Gear</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile Collapsible Menu -->
+  @if (isMobileMenuOpen()) {
+    <div class="mobile-drawer d-lg-none bg-white border-bottom p-3">
+      <!-- Search inside mobile -->
+      <form class="mb-3" (submit)="onSearch($event)">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Search products..."
+            [(ngModel)]="searchQuery"
+            name="searchMobile"
+          />
+          <button class="btn btn-primary-blue" type="submit">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Quick Action Icons in Mobile -->
+      <div class="d-flex justify-content-around py-2 border-top border-bottom mb-3 text-center">
+        <a routerLink="/wishlist" (click)="closeMobileMenu()" class="action-btn position-relative">
+          <i class="bi bi-heart fs-4"></i>
+          @if (wishlistService.count() > 0) {
+            <span class="badge rounded-pill bg-danger ms-1">{{ wishlistService.count() }}</span>
+          }
+          <div class="text-xs mt-1">Wishlist</div>
+        </a>
+        <a routerLink="/cart" (click)="closeMobileMenu()" class="action-btn position-relative">
+          <i class="bi bi-bag fs-4"></i>
+          @if (cartService.totalItems() > 0) {
+            <span class="badge rounded-pill bg-primary ms-1">{{ cartService.totalItems() }}</span>
+          }
+          <div class="text-xs mt-1">Cart (${{ cartService.subtotal().toFixed(2) }})</div>
+        </a>
+        <a routerLink="/profile" (click)="closeMobileMenu()" class="action-btn">
+          <i class="bi bi-person fs-4"></i>
+          <div class="text-xs mt-1">Account</div>
+        </a>
+      </div>
+
+      <!-- Navigation Links -->
+      <ul class="list-unstyled mb-0">
+        <li class="py-2 border-bottom">
+          <a routerLink="/" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-medium">
+            <span><i class="bi bi-house me-2"></i> Home</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+        <li class="py-2 border-bottom">
+          <a routerLink="/products" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-medium">
+            <span><i class="bi bi-grid me-2"></i> All Products</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+        <li class="py-2 border-bottom">
+          <a routerLink="/products" [queryParams]="{ category: 'cat-laptops' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
+            <span><i class="bi bi-laptop me-2"></i> Laptops & PCs</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+        <li class="py-2 border-bottom">
+          <a routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
+            <span><i class="bi bi-phone me-2"></i> Smartphones</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+        <li class="py-2 border-bottom">
+          <a routerLink="/products" [queryParams]="{ category: 'cat-audio' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
+            <span><i class="bi bi-headphones me-2"></i> Audio & Acoustics</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+        <li class="py-2 border-bottom">
+          <a routerLink="/orders" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
+            <span><i class="bi bi-truck me-2"></i> My Orders</span>
+            <i class="bi bi-chevron-right text-muted text-xs"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  }
+</header>

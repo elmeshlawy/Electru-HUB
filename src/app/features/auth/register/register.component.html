@@ -1,0 +1,54 @@
+<div class="auth-page py-5">
+  <div class="container-xl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+        <div class="card bg-white p-4 p-md-5 border rounded-4 shadow-sm">
+          <div class="text-center mb-4">
+            <div class="brand-icon-box mx-auto mb-3">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+            <h2 class="fw-bold text-navy mb-1">Create Account</h2>
+            <p class="text-muted text-sm">Join ElectroHub for exclusive access to premier tech launches</p>
+          </div>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <div class="row g-3 mb-3">
+              <div class="col-sm-6">
+                <label class="form-label text-xs fw-semibold text-navy">First Name</label>
+                <input type="text" class="form-control" formControlName="firstName" placeholder="Alex" />
+              </div>
+              <div class="col-sm-6">
+                <label class="form-label text-xs fw-semibold text-navy">Last Name</label>
+                <input type="text" class="form-control" formControlName="lastName" placeholder="Vance" />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label text-xs fw-semibold text-navy">Email Address</label>
+              <input type="email" class="form-control" formControlName="email" placeholder="alex@electrohub.io" />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label text-xs fw-semibold text-navy">Password (Minimum 8 chars)</label>
+              <input type="password" class="form-control" formControlName="password" placeholder="••••••••" />
+            </div>
+
+            <button type="submit" class="btn btn-primary-blue w-100 py-2 mb-3" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Creating Profile...
+              } @else {
+                Create Account
+              }
+            </button>
+          </form>
+
+          <div class="text-center text-xs text-muted">
+            Already have an ElectroHub account?
+            <a routerLink="/auth/login" class="text-primary-blue fw-semibold text-decoration-none ms-1">Sign In</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

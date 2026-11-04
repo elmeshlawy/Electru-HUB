@@ -1,0 +1,27 @@
+.cart-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  background-color: #f8fafc;
+  padding: 4px;
+}
+
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600);
+}
+
+.bg-primary-blue {
+  background-color: var(--eh-blue-600) !important;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}

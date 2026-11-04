@@ -1,0 +1,72 @@
+<div class="auth-page py-5">
+  <div class="container-xl">
+    <div class="row justify-content-center">
+      <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+        <div class="card bg-white p-4 p-md-5 border rounded-4 shadow-sm">
+          <div class="text-center mb-4">
+            <div class="brand-icon-box mx-auto mb-3">
+              <i class="bi bi-cpu-fill"></i>
+            </div>
+            <h2 class="fw-bold text-navy mb-1">Welcome Back</h2>
+            <p class="text-muted text-sm">Sign in to your ElectroHub account</p>
+          </div>
+
+          @if (errorMessage()) {
+            <div class="alert alert-danger py-2 text-sm mb-3">
+              {{ errorMessage() }}
+            </div>
+          }
+
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label class="form-label text-xs fw-semibold text-navy">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input
+                  type="email"
+                  class="form-control border-start-0 ps-1"
+                  formControlName="email"
+                  placeholder="name@example.com"
+                />
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <label class="form-label text-xs fw-semibold text-navy mb-0">Password</label>
+                <a href="#forgot" class="text-xs text-primary-blue text-decoration-none">Forgot password?</a>
+              </div>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input
+                  type="password"
+                  class="form-control border-start-0 ps-1"
+                  formControlName="password"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary-blue w-100 py-2 mb-3" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                Signing In...
+              } @else {
+                Sign In
+              }
+            </button>
+          </form>
+
+          <div class="text-center text-xs text-muted">
+            Don't have an account yet?
+            <a routerLink="/auth/register" class="text-primary-blue fw-semibold text-decoration-none ms-1">Create Account</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

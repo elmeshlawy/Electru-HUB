@@ -1,0 +1,143 @@
+<div class="home-page">
+  <!-- Hero Section -->
+  <section class="hero-section py-5">
+    <div class="container-xl">
+      <div class="row align-items-center g-5">
+        <div class="col-12 col-lg-7">
+          <div class="hero-badge d-inline-flex align-items-center gap-2 mb-3">
+            <span class="pulse-indicator"></span>
+            <span class="text-xs fw-bold text-uppercase tracking-wider">ElectroHub 2026 Collection</span>
+          </div>
+          <h1 class="hero-title display-4 fw-extrabold text-navy mb-3">
+            Next-Gen Tech Engineered For Peak <span class="text-gradient-blue">Performance</span>
+          </h1>
+          <p class="hero-subtitle text-secondary mb-4 pe-lg-5">
+            Discover precision-crafted laptops, audiophile acoustics, titanium flagships, and cutting-edge gaming hardware with 2-year warranty and express delivery.
+          </p>
+          <div class="d-flex flex-wrap gap-3">
+            <a routerLink="/products" class="btn btn-primary-blue btn-lg">
+              Explore Catalog <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+            <a routerLink="/products" [queryParams]="{ sortBy: 'rating' }" class="btn btn-outline-navy btn-lg">
+              Top Rated Gear
+            </a>
+          </div>
+          <!-- Trust Stats -->
+          <div class="row pt-4 mt-4 border-top g-3">
+            <div class="col-4">
+              <div class="fw-bold fs-4 text-navy">50K+</div>
+              <div class="text-xs text-muted">Active Customers</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold fs-4 text-navy">100%</div>
+              <div class="text-xs text-muted">Authentic Products</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold fs-4 text-navy">24/7</div>
+              <div class="text-xs text-muted">Expert Support</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+          <div class="hero-card-featured position-relative p-4 rounded-4 shadow-lg text-white">
+            <div class="badge bg-warning text-dark fw-bold mb-2">FLAGSHIP SPOTLIGHT</div>
+            <h3 class="fw-bold text-white mb-1">Apex Pro 16" Studio</h3>
+            <p class="text-white-50 text-xs mb-3">Liquid Retina XDR, M3 Max 16-Core, 32GB RAM</p>
+            <div class="hero-image-box text-center my-3">
+              <img
+                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80"
+                alt="Apex Pro"
+                class="img-fluid rounded-3 hero-featured-img shadow"
+              />
+            </div>
+            <div class="d-flex align-items-center justify-content-between pt-2">
+              <div>
+                <span class="text-white-50 text-xs d-block">Starting from</span>
+                <span class="fs-4 fw-bold text-white">$2,499.99</span>
+              </div>
+              <a [routerLink]="['/products', 'apex-pro-16-ultra-studio']" class="btn btn-light btn-sm fw-bold">
+                View Specs <i class="bi bi-chevron-right"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories Section -->
+  <section class="py-5 bg-white border-top border-bottom">
+    <div class="container-xl">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <div class="section-subtitle">Categorical Taxonomy</div>
+          <h2 class="section-title mb-0">Browse By Department</h2>
+        </div>
+        <a routerLink="/products" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
+          All Categories <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        @for (category of categories(); track category.id) {
+          <div class="col-6 col-md-4 col-lg-2">
+            <a [routerLink]="['/products']" [queryParams]="{ category: category.id }" class="category-card text-decoration-none d-block text-center p-3 h-100">
+              <div class="category-icon-box mx-auto mb-2">
+                <i class="bi" [class]="category.icon ?? 'bi-box'"></i>
+              </div>
+              <h6 class="category-name text-navy fw-bold mb-1">{{ category.name }}</h6>
+              <span class="text-xs text-muted">{{ category.productCount }} Products</span>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <section class="py-5">
+    <div class="container-xl">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <div class="section-subtitle">Curated Selection</div>
+          <h2 class="section-title mb-0">Featured Innovations</h2>
+        </div>
+        <a routerLink="/products" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
+          View All Products <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        @for (product of featuredProducts(); track product.id) {
+          <div class="col-12 col-sm-6 col-lg-3">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- New Arrivals Section -->
+  <section class="py-5 bg-white border-top">
+    <div class="container-xl">
+      <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+          <div class="section-subtitle">Fresh In Inventory</div>
+          <h2 class="section-title mb-0">Latest Arrivals</h2>
+        </div>
+        <a routerLink="/products" [queryParams]="{ sortBy: 'newest' }" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
+          See What's New <i class="bi bi-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="row g-4">
+        @for (product of newArrivals(); track product.id) {
+          <div class="col-12 col-sm-6 col-lg-4">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

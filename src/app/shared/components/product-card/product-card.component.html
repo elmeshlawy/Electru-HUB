@@ -1,0 +1,110 @@
+<div class="eh-card product-card h-100 d-flex flex-column">
+  <!-- Card Header / Media -->
+  <div class="card-media-wrapper position-relative overflow-hidden">
+    <!-- Badges -->
+    <div class="product-badge-group position-absolute top-0 start-0 m-3 d-flex flex-column gap-1 z-2">
+      @if (product().discountPercentage && product().discountPercentage! > 0) {
+        <span class="badge badge-sale">
+          -{{ product().discountPercentage }}% OFF
+        </span>
+      }
+      @if (product().isNewArrival) {
+        <span class="badge badge-tech">
+          NEW
+        </span>
+      }
+      @if (product().isBestSeller && !product().isNewArrival) {
+        <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.72rem; border-radius: 9999px;">
+          BEST SELLER
+        </span>
+      }
+    </div>
+
+    <!-- Quick Wishlist Button -->
+    <button
+      type="button"
+      class="btn-wishlist position-absolute top-0 end-0 m-3 z-2"
+      [class.active]="isInWishlist()"
+      (click)="onToggleWishlist($event)"
+      [title]="isInWishlist() ? 'Remove from Wishlist' : 'Add to Wishlist'"
+      aria-label="Wishlist"
+    >
+      <i class="bi" [class.bi-heart-fill]="isInWishlist()" [class.bi-heart]="!isInWishlist()" [class.text-danger]="isInWishlist()"></i>
+    </button>
+
+    <!-- Product Image -->
+    <a [routerLink]="['/products', product().slug]" class="d-block text-center product-image-link p-4">
+      <img
+        [src]="product().featuredImage"
+        [alt]="product().name"
+        class="img-fluid product-image"
+        loading="lazy"
+      />
+    </a>
+  </div>
+
+  <!-- Card Body / Info -->
+  <div class="card-body p-4 d-flex flex-column flex-grow-1">
+    <!-- Brand & Category -->
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <span class="text-xs fw-semibold text-uppercase text-muted">{{ product().brand }}</span>
+      <span class="text-xs text-primary fw-medium">{{ product().categoryName }}</span>
+    </div>
+
+    <!-- Product Name -->
+    <h3 class="product-title mb-2">
+      <a [routerLink]="['/products', product().slug]" class="text-navy text-decoration-none" [title]="product().name">
+        {{ product().name }}
+      </a>
+    </h3>
+
+    <!-- Rating & Reviews -->
+    <div class="d-flex align-items-center gap-1 mb-3">
+      <div class="rating-stars text-warning text-xs">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <span class="fw-bold text-xs text-navy">{{ product().rating }}</span>
+      <span class="text-muted text-xs">({{ product().reviewCount }})</span>
+    </div>
+
+    <!-- Short Specs or Snippet if available -->
+    @if (product().shortDescription) {
+      <p class="text-muted text-xs line-clamp-2 mb-3">
+        {{ product().shortDescription }}
+      </p>
+    }
+
+    <!-- Pricing & Action (Pushed to bottom) -->
+    <div class="mt-auto pt-3 border-top d-flex align-items-center justify-content-between">
+      <div>
+        <div class="d-flex align-items-baseline gap-2">
+          <span class="price-current fw-bold text-navy">{{ product().price | currencyFormat }}</span>
+          @if (product().originalPrice && product().originalPrice! > product().price) {
+            <span class="price-original text-muted text-decoration-line-through text-xs">
+              {{ product().originalPrice | currencyFormat }}
+            </span>
+          }
+        </div>
+        <div class="stock-status text-xs">
+          @if (product().inStock && product().stock > 0) {
+            <span class="text-success"><i class="bi bi-check2-circle me-1"></i>In Stock</span>
+          } @else {
+            <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+          }
+        </div>
+      </div>
+
+      <!-- Quick Add to Cart -->
+      <button
+        type="button"
+        class="btn btn-sm btn-primary-blue rounded-circle p-2 cart-quick-btn"
+        [class.btn-success]="isInCart()"
+        (click)="onAddToCart($event)"
+        [title]="isInCart() ? 'Added to Cart' : 'Add to Cart'"
+        aria-label="Add to cart"
+      >
+        <i class="bi" [class.bi-check-lg]="isInCart()" [class.bi-cart-plus]="!isInCart()"></i>
+      </button>
+    </div>
+  </div>
+</div>

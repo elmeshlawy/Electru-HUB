@@ -1,0 +1,39 @@
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600);
+}
+
+.sort-select {
+  width: auto;
+  min-width: 170px;
+  border-radius: var(--eh-radius-md);
+  border-color: var(--eh-border);
+}
+
+.filter-option-btn {
+  color: var(--eh-navy-700);
+  font-size: 0.875rem;
+  transition: all var(--eh-transition-fast);
+}
+
+.filter-option-btn:hover {
+  background-color: var(--eh-bg-subtle) !important;
+  color: var(--eh-blue-600);
+}
+
+.filter-option-btn.active {
+  background-color: var(--eh-blue-50) !important;
+  color: var(--eh-blue-700);
+  font-weight: 600;
+}

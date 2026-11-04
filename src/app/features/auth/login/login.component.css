@@ -1,0 +1,27 @@
+.brand-icon-box {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, var(--eh-blue-600), var(--eh-navy-900));
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--eh-radius-md);
+  font-size: 1.5rem;
+}
+
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600);
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}

@@ -1,0 +1,44 @@
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600);
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.payment-option {
+  transition: all var(--eh-transition-fast);
+}
+
+.payment-option:hover {
+  background-color: var(--eh-bg-subtle);
+  border-color: var(--eh-blue-400) !important;
+}
+
+.order-success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--eh-success-light);
+  color: var(--eh-success);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.max-w-500 {
+  max-width: 500px;
+}

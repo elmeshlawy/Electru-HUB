@@ -1,0 +1,50 @@
+<div class="wishlist-page py-4">
+  <div class="container-xl">
+    <nav aria-label="breadcrumb" class="mb-3">
+      <ol class="breadcrumb text-xs">
+        <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Saved Items</li>
+      </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 fw-bold text-navy mb-1">My Wishlist</h1>
+        <p class="text-muted text-sm mb-0">
+          You have <strong class="text-navy">{{ count() }}</strong> saved item(s)
+        </p>
+      </div>
+
+      @if (!isEmpty()) {
+        <div class="d-flex gap-2">
+          <button type="button" class="btn btn-primary-blue btn-sm" (click)="addAllToCart()">
+            <i class="bi bi-cart-plus me-1"></i> Add All to Cart
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" (click)="clearWishlist()">
+            Clear All
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (!isEmpty()) {
+      <div class="row g-4">
+        @for (product of items(); track product.id) {
+          <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="bg-white rounded-3 border p-5">
+        <app-empty-state
+          icon="bi-heart"
+          title="Your Wishlist is Empty"
+          description="Save flagship items you love to keep an eye on price drops and stock updates."
+          actionText="Browse Tech Catalog"
+          actionRoute="/products"
+        ></app-empty-state>
+      </div>
+    }
+  </div>
+</div>

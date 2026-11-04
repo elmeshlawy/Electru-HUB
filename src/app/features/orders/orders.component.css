@@ -1,0 +1,23 @@
+.order-item-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  background-color: #f8fafc;
+  padding: 4px;
+}
+
+.text-navy {
+  color: var(--eh-navy-950);
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-primary-blue {
+  color: var(--eh-blue-600);
+}
