@@ -79,6 +79,7 @@
                           [src]="item.productImage"
                           [alt]="item.productName"
                           class="order-item-thumb rounded border"
+                          (error)="onImageError($event)"
                         />
                       </a>
                       <div>

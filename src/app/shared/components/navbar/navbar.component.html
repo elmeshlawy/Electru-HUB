@@ -144,13 +144,13 @@
         <!-- User Authentication (Desktop) -->
         <div class="d-none d-lg-block">
           @if (authService.isAuthenticated()) {
-            <div class="dropdown">
+            <div class="dropdown position-relative">
               <button
                 class="btn btn-user-menu d-flex align-items-center gap-2 dropdown-toggle"
                 type="button"
                 id="userMenuButton"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
+                (click)="toggleUserMenu($event)"
+                [attr.aria-expanded]="isUserMenuOpen()"
               >
                 @if (authService.currentUser()?.avatarUrl) {
                   <img [src]="authService.currentUser()?.avatarUrl" alt="Avatar" class="user-avatar" />
@@ -162,29 +162,31 @@
                   <span class="text-xs text-muted">Account</span>
                 </div>
               </button>
-              <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 p-2" aria-labelledby="userMenuButton">
-                <li>
-                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/profile">
-                    <i class="bi bi-person text-primary-blue"></i> My Profile
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/orders">
-                    <i class="bi bi-box-seam text-primary-blue"></i> Order History
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/wishlist">
-                    <i class="bi bi-heart text-danger"></i> Saved Items
-                  </a>
-                </li>
-                <li><hr class="dropdown-divider my-1"></li>
-                <li>
-                  <button class="dropdown-item rounded py-2 text-danger d-flex align-items-center gap-2" (click)="onLogout()">
-                    <i class="bi bi-box-arrow-right"></i> Sign Out
-                  </button>
-                </li>
-              </ul>
+              @if (isUserMenuOpen()) {
+                <ul class="dropdown-menu dropdown-menu-end show shadow-sm border-0 mt-2 p-2 position-absolute" (click)="$event.stopPropagation()" aria-labelledby="userMenuButton">
+                  <li>
+                    <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/profile" (click)="closeUserMenu()">
+                      <i class="bi bi-person text-primary-blue"></i> My Profile
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/orders" (click)="closeUserMenu()">
+                      <i class="bi bi-box-seam text-primary-blue"></i> Order History
+                    </a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/wishlist" (click)="closeUserMenu()">
+                      <i class="bi bi-heart text-danger"></i> Saved Items
+                    </a>
+                  </li>
+                  <li><hr class="dropdown-divider my-1"></li>
+                  <li>
+                    <button class="dropdown-item rounded py-2 text-danger d-flex align-items-center gap-2" (click)="closeUserMenu(); onLogout()">
+                      <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </button>
+                  </li>
+                </ul>
+              }
             </div>
           } @else {
             <a routerLink="/auth/login" class="btn btn-primary-blue py-2 px-3 text-sm">

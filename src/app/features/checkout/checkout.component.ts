@@ -9,6 +9,7 @@ import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
 import { Address } from '../../core/models/address.model';
 import { Order, OrderItem, PaymentMethod } from '../../core/models/order.model';
 import { CartSummary } from '../../core/models/cart.model';
+import { handleImageFallback } from '../../shared/constants/image.constants';
 
 export interface ShippingOption {
   id: string;
@@ -150,6 +151,10 @@ export class CheckoutComponent {
 
   onPaymentMethodChange(method: PaymentMethod): void {
     this.checkoutForm.patchValue({ paymentMethod: method });
+  }
+
+  onImageError(event: Event): void {
+    handleImageFallback(event);
   }
 
   onSubmit(): void {

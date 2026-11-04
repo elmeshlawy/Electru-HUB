@@ -73,6 +73,7 @@
                         [src]="item.productImage"
                         [alt]="item.productName"
                         class="confirmation-thumb rounded border"
+                        (error)="onImageError($event)"
                       />
                       <div>
                         <h6 class="text-navy fw-semibold mb-1 text-sm">{{ item.productName }}</h6>
@@ -478,7 +479,7 @@
                 @for (item of items(); track item.id) {
                   <div class="d-flex align-items-center justify-content-between py-2 border-bottom text-xs">
                     <div class="d-flex align-items-center gap-2">
-                      <img [src]="item.product.featuredImage" [alt]="item.product.name" class="mini-thumb rounded border" />
+                      <img [src]="item.product.featuredImage" [alt]="item.product.name" class="mini-thumb rounded border" (error)="onImageError($event)" />
                       <div>
                         <span class="text-navy text-truncate d-block fw-semibold" style="max-width: 150px;">
                           {{ item.product.name }}

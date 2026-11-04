@@ -104,6 +104,7 @@
                               [src]="item.product.featuredImage"
                               [alt]="item.product.name"
                               class="cart-thumb rounded border"
+                              (error)="onImageError($event)"
                             />
                           </a>
                           <div>

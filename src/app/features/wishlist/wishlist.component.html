@@ -95,6 +95,7 @@
                   [alt]="product.name"
                   class="img-fluid wishlist-image"
                   loading="lazy"
+                  (error)="onImageError($event)"
                 />
               </a>
 

@@ -6,6 +6,7 @@ import { CartService } from '../../core/services/cart.service';
 import { Product } from '../../core/models/product.model';
 import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { handleImageFallback } from '../../shared/constants/image.constants';
 
 @Component({
   selector: 'app-wishlist',
@@ -102,6 +103,10 @@ export class WishlistComponent {
   // Check if recently added to cart
   isJustAdded(productId: string): boolean {
     return this.recentlyAdded().has(productId);
+  }
+
+  onImageError(event: Event): void {
+    handleImageFallback(event);
   }
 
   private showFeedback(text: string, type: 'success' | 'info' | 'warning'): void {

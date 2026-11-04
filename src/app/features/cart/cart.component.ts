@@ -7,6 +7,7 @@ import { WishlistService } from '../../core/services/wishlist.service';
 import { Product } from '../../core/models/product.model';
 import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { handleImageFallback } from '../../shared/constants/image.constants';
 
 @Component({
   selector: 'app-cart',
@@ -96,6 +97,10 @@ export class CartComponent {
   clearCart(): void {
     this.cartService.clearCart();
     this.showFeedback('All items cleared from your shopping cart.', 'info');
+  }
+
+  onImageError(event: Event): void {
+    handleImageFallback(event);
   }
 
   private showFeedback(text: string, type: 'success' | 'warning' | 'info'): void {

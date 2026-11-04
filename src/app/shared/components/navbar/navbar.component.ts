@@ -27,6 +27,7 @@ export class NavbarComponent {
   isMobileMenuOpen = signal<boolean>(false);
   isCategoriesDropdownOpen = signal<boolean>(false);
   isMobileCategoriesOpen = signal<boolean>(false);
+  isUserMenuOpen = signal<boolean>(false);
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update((open) => !open);
@@ -41,11 +42,24 @@ export class NavbarComponent {
     if (event) {
       event.stopPropagation();
     }
+    this.isUserMenuOpen.set(false);
     this.isCategoriesDropdownOpen.update((open) => !open);
   }
 
   closeCategoriesDropdown(): void {
     this.isCategoriesDropdownOpen.set(false);
+  }
+
+  toggleUserMenu(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isCategoriesDropdownOpen.set(false);
+    this.isUserMenuOpen.update((open) => !open);
+  }
+
+  closeUserMenu(): void {
+    this.isUserMenuOpen.set(false);
   }
 
   toggleMobileCategories(): void {
@@ -55,6 +69,7 @@ export class NavbarComponent {
   @HostListener('document:click')
   onDocumentClick(): void {
     this.isCategoriesDropdownOpen.set(false);
+    this.isUserMenuOpen.set(false);
   }
 
   onSearch(event?: Event): void {

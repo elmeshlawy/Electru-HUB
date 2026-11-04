@@ -5,6 +5,7 @@ import { OrderService } from '../../core/services/order.service';
 import { CurrencyFormatPipe } from '../../shared/pipes/currency-format.pipe';
 import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
 import { OrderStatus } from '../../core/models/order.model';
+import { handleImageFallback } from '../../shared/constants/image.constants';
 
 @Component({
   selector: 'app-orders',
@@ -44,6 +45,10 @@ export class OrdersComponent {
       default:
         return 'bg-secondary-subtle text-secondary';
     }
+  }
+
+  onImageError(event: Event): void {
+    handleImageFallback(event);
   }
 
   cancelOrder(orderId: string): void {
