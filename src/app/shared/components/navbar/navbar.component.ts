@@ -1,10 +1,11 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, HostListener, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { ProductService } from '../../../core/services/product.service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,9 +19,14 @@ export class NavbarComponent {
   readonly cartService = inject(CartService);
   readonly wishlistService = inject(WishlistService);
   readonly authService = inject(AuthService);
+  readonly productService = inject(ProductService);
+
+  readonly categories = this.productService.categories;
 
   searchQuery = signal<string>('');
   isMobileMenuOpen = signal<boolean>(false);
+  isCategoriesDropdownOpen = signal<boolean>(false);
+  isMobileCategoriesOpen = signal<boolean>(false);
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen.update((open) => !open);
@@ -28,6 +34,27 @@ export class NavbarComponent {
 
   closeMobileMenu(): void {
     this.isMobileMenuOpen.set(false);
+    this.isMobileCategoriesOpen.set(false);
+  }
+
+  toggleCategoriesDropdown(event?: Event): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    this.isCategoriesDropdownOpen.update((open) => !open);
+  }
+
+  closeCategoriesDropdown(): void {
+    this.isCategoriesDropdownOpen.set(false);
+  }
+
+  toggleMobileCategories(): void {
+    this.isMobileCategoriesOpen.update((open) => !open);
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.isCategoriesDropdownOpen.set(false);
   }
 
   onSearch(event?: Event): void {

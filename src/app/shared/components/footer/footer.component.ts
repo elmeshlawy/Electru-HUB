@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ProductService } from '../../../core/services/product.service';
 
 @Component({
   selector: 'app-footer',
@@ -11,6 +12,9 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './footer.component.css',
 })
 export class FooterComponent {
+  readonly productService = inject(ProductService);
+  readonly categories = this.productService.categories;
+
   currentYear = new Date().getFullYear();
   newsletterEmail = '';
   newsletterSubscribed = false;

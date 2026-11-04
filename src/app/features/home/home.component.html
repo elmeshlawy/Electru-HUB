@@ -1,63 +1,91 @@
 <div class="home-page">
-  <!-- Hero Section -->
-  <section class="hero-section py-5">
-    <div class="container-xl">
+  <!-- Interactive Toast Notification -->
+  @if (feedbackToast()) {
+    <div class="feedback-toast-wrapper position-fixed top-0 end-0 p-3 z-3">
+      <div class="toast show align-items-center text-white bg-navy-950 border-0 shadow-lg" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body d-flex align-items-center gap-2 py-3 px-3 text-sm">
+            <i class="bi bi-check-circle-fill text-success fs-5"></i>
+            <span>{{ feedbackToast() }}</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="feedbackToast.set(null)" aria-label="Close"></button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 1. Hero Section -->
+  <section class="hero-section py-5 position-relative overflow-hidden">
+    <div class="container-xl position-relative z-1 py-lg-4">
       <div class="row align-items-center g-5">
+        <!-- Hero Text -->
         <div class="col-12 col-lg-7">
           <div class="hero-badge d-inline-flex align-items-center gap-2 mb-3">
             <span class="pulse-indicator"></span>
             <span class="text-xs fw-bold text-uppercase tracking-wider">ElectroHub 2026 Collection</span>
           </div>
           <h1 class="hero-title display-4 fw-extrabold text-navy mb-3">
-            Next-Gen Tech Engineered For Peak <span class="text-gradient-blue">Performance</span>
+            Engineered For Peak Performance. Built For <span class="text-gradient-blue">Future Tech</span>.
           </h1>
-          <p class="hero-subtitle text-secondary mb-4 pe-lg-5">
-            Discover precision-crafted laptops, audiophile acoustics, titanium flagships, and cutting-edge gaming hardware with 2-year warranty and express delivery.
+          <p class="hero-subtitle text-secondary mb-4 pe-lg-5 fs-5">
+            Discover precision-crafted workstations, audiophile acoustic headphones, 5K reference displays, and esports hardware with official 2-year warranty and free express shipping.
           </p>
-          <div class="d-flex flex-wrap gap-3">
-            <a routerLink="/products" class="btn btn-primary-blue btn-lg">
-              Explore Catalog <i class="bi bi-arrow-right ms-1"></i>
+          <div class="d-flex flex-wrap gap-3 mb-5">
+            <a routerLink="/products" class="btn btn-primary-blue btn-lg px-4 py-3 shadow-md">
+              <i class="bi bi-bag-check me-2"></i> Shop Now
             </a>
-            <a routerLink="/products" [queryParams]="{ sortBy: 'rating' }" class="btn btn-outline-navy btn-lg">
-              Top Rated Gear
-            </a>
+            <button type="button" class="btn btn-outline-navy btn-lg px-4 py-3" (click)="scrollToSection('categories-section')">
+              <i class="bi bi-grid-3x3-gap me-2"></i> Explore Categories
+            </button>
           </div>
-          <!-- Trust Stats -->
-          <div class="row pt-4 mt-4 border-top g-3">
+
+          <!-- Trust Bar -->
+          <div class="row pt-4 border-top g-3">
             <div class="col-4">
               <div class="fw-bold fs-4 text-navy">50K+</div>
-              <div class="text-xs text-muted">Active Customers</div>
+              <div class="text-xs text-muted">Active Enthusiasts</div>
             </div>
             <div class="col-4">
               <div class="fw-bold fs-4 text-navy">100%</div>
               <div class="text-xs text-muted">Authentic Products</div>
             </div>
             <div class="col-4">
-              <div class="fw-bold fs-4 text-navy">24/7</div>
-              <div class="text-xs text-muted">Expert Support</div>
+              <div class="fw-bold fs-4 text-navy">2 Years</div>
+              <div class="text-xs text-muted">Direct Warranty</div>
             </div>
           </div>
         </div>
 
+        <!-- Hero Featured Visual Card -->
         <div class="col-12 col-lg-5">
-          <div class="hero-card-featured position-relative p-4 rounded-4 shadow-lg text-white">
-            <div class="badge bg-warning text-dark fw-bold mb-2">FLAGSHIP SPOTLIGHT</div>
-            <h3 class="fw-bold text-white mb-1">Apex Pro 16" Studio</h3>
-            <p class="text-white-50 text-xs mb-3">Liquid Retina XDR, M3 Max 16-Core, 32GB RAM</p>
-            <div class="hero-image-box text-center my-3">
-              <img
-                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=700&q=80"
-                alt="Apex Pro"
-                class="img-fluid rounded-3 hero-featured-img shadow"
-              />
+          <div class="hero-card-featured p-4 p-md-5 rounded-4 shadow-lg text-white position-relative">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <span class="badge bg-warning text-dark fw-bold px-3 py-1 text-xs">FLAGSHIP OF THE YEAR</span>
+              <span class="text-xs text-white-50"><i class="bi bi-shield-check me-1"></i>Official Stock</span>
             </div>
-            <div class="d-flex align-items-center justify-content-between pt-2">
+
+            <h3 class="fw-bold text-white mb-1">Apex Pro 16" Ultra Studio</h3>
+            <p class="text-white-50 text-xs mb-3">Liquid Retina XDR, M3 Max 16-Core, 32GB RAM, 1TB NVMe</p>
+
+            <div class="hero-image-box text-center my-4 position-relative">
+              <img
+                src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=800&q=80"
+                alt="Apex Pro 16 Laptop"
+                class="img-fluid rounded-3 hero-featured-img shadow-lg"
+              />
+              <div class="floating-spec-pill position-absolute bottom-0 start-0 m-2 bg-navy-950 px-3 py-1 rounded-pill text-xs border border-secondary border-opacity-50">
+                <i class="bi bi-cpu text-info me-1"></i> 16-Core Neural Engine
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between pt-2 border-top border-white border-opacity-10">
               <div>
                 <span class="text-white-50 text-xs d-block">Starting from</span>
                 <span class="fs-4 fw-bold text-white">$2,499.99</span>
+                <span class="text-decoration-line-through text-white-50 text-xs ms-2">$2,699.99</span>
               </div>
-              <a [routerLink]="['/products', 'apex-pro-16-ultra-studio']" class="btn btn-light btn-sm fw-bold">
-                View Specs <i class="bi bi-chevron-right"></i>
+              <a [routerLink]="['/products', 'apex-pro-16-ultra-studio']" class="btn btn-light btn-sm fw-bold px-3 py-2">
+                View Specs <i class="bi bi-chevron-right ms-1"></i>
               </a>
             </div>
           </div>
@@ -66,28 +94,32 @@
     </div>
   </section>
 
-  <!-- Categories Section -->
-  <section class="py-5 bg-white border-top border-bottom">
-    <div class="container-xl">
-      <div class="d-flex justify-content-between align-items-end mb-4">
+  <!-- 2. Categories Section -->
+  <section id="categories-section" class="py-5 bg-white border-top border-bottom">
+    <div class="container-xl py-lg-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-2">
         <div>
-          <div class="section-subtitle">Categorical Taxonomy</div>
-          <h2 class="section-title mb-0">Browse By Department</h2>
+          <div class="section-subtitle">Taxonomy & Gear</div>
+          <h2 class="section-title mb-0">Browse By Category</h2>
         </div>
-        <a routerLink="/products" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
-          All Categories <i class="bi bi-arrow-right"></i>
+        <a routerLink="/products" class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-1 text-primary-blue">
+          <span>View All Departments</span> <i class="bi bi-arrow-right"></i>
         </a>
       </div>
 
       <div class="row g-4">
         @for (category of categories(); track category.id) {
           <div class="col-6 col-md-4 col-lg-2">
-            <a [routerLink]="['/products']" [queryParams]="{ category: category.id }" class="category-card text-decoration-none d-block text-center p-3 h-100">
-              <div class="category-icon-box mx-auto mb-2">
+            <a
+              [routerLink]="['/products']"
+              [queryParams]="{ category: category.id }"
+              class="category-tile text-decoration-none d-block text-center p-3 p-md-4 h-100 rounded-3 border"
+            >
+              <div class="category-icon-box mx-auto mb-3 shadow-xs">
                 <i class="bi" [class]="category.icon ?? 'bi-box'"></i>
               </div>
               <h6 class="category-name text-navy fw-bold mb-1">{{ category.name }}</h6>
-              <span class="text-xs text-muted">{{ category.productCount }} Products</span>
+              <span class="badge bg-light text-muted border text-xs">{{ category.productCount }} Products</span>
             </a>
           </div>
         }
@@ -95,48 +127,198 @@
     </div>
   </section>
 
-  <!-- Featured Products Section -->
+  <!-- 3. Featured Products Section -->
   <section class="py-5">
-    <div class="container-xl">
-      <div class="d-flex justify-content-between align-items-end mb-4">
+    <div class="container-xl py-lg-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-2">
         <div>
-          <div class="section-subtitle">Curated Selection</div>
-          <h2 class="section-title mb-0">Featured Innovations</h2>
+          <div class="section-subtitle">Curated Collection</div>
+          <h2 class="section-title mb-0">Featured Products</h2>
         </div>
-        <a routerLink="/products" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
-          View All Products <i class="bi bi-arrow-right"></i>
+        <a routerLink="/products" class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-1 text-primary-blue">
+          <span>View Full Catalog</span> <i class="bi bi-arrow-right"></i>
         </a>
       </div>
 
       <div class="row g-4">
         @for (product of featuredProducts(); track product.id) {
-          <div class="col-12 col-sm-6 col-lg-3">
-            <app-product-card [product]="product"></app-product-card>
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <app-product-card
+              [product]="product"
+              (addedToCart)="onProductAdded($event)"
+              (toggledWishlist)="onWishlistToggled($event)"
+            ></app-product-card>
           </div>
         }
       </div>
     </div>
   </section>
 
-  <!-- New Arrivals Section -->
-  <section class="py-5 bg-white border-top">
+  <!-- 4. Special Offers Promotional Banner -->
+  <section class="py-5 bg-white border-top border-bottom">
     <div class="container-xl">
-      <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-          <div class="section-subtitle">Fresh In Inventory</div>
-          <h2 class="section-title mb-0">Latest Arrivals</h2>
+      <div class="special-offer-banner rounded-4 p-4 p-md-5 overflow-hidden position-relative">
+        <div class="row align-items-center g-4 position-relative z-1">
+          <div class="col-12 col-lg-7 text-white">
+            <div class="d-inline-flex align-items-center gap-2 mb-3 bg-white bg-opacity-10 px-3 py-1 rounded-pill text-xs fw-bold">
+              <i class="bi bi-lightning-charge-fill text-warning"></i>
+              <span>LIMITED HARDWARE DROP &bull; SAVE UP TO 20%</span>
+            </div>
+            <h2 class="display-6 fw-extrabold text-white mb-3">
+              Level Up Your Setup With Pro Acoustics & OLED Monitors
+            </h2>
+            <p class="text-white-50 fs-6 mb-4 pe-lg-4">
+              Unlock exclusive promotional discounts on AuraStudio ANC headphones, Apex Horizon 34-inch QD-OLED curved screens, and mechanical Hall-effect gear.
+            </p>
+            <div class="d-flex flex-wrap align-items-center gap-3">
+              <a routerLink="/products" class="btn btn-light btn-lg fw-bold text-navy px-4">
+                Shop Special Offers <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+              <div class="promo-code-pill px-3 py-2 rounded-3 text-xs d-flex align-items-center gap-2">
+                <span class="text-white-50">Use Code:</span>
+                <strong class="text-warning tracking-wider">ELECTRO2026</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-12 col-lg-5 text-center">
+            <img
+              src="https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=700&q=80"
+              alt="Curved OLED Monitor Offer"
+              class="img-fluid rounded-4 shadow-lg special-offer-img"
+            />
+          </div>
         </div>
-        <a routerLink="/products" [queryParams]="{ sortBy: 'newest' }" class="text-decoration-none fw-semibold d-flex align-items-center gap-1 text-primary-blue">
-          See What's New <i class="bi bi-arrow-right"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Best Sellers Section -->
+  <section class="py-5">
+    <div class="container-xl py-lg-3">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 gap-2">
+        <div>
+          <div class="section-subtitle">Customer Favorites</div>
+          <h2 class="section-title mb-0">Best Sellers</h2>
+        </div>
+        <a routerLink="/products" [queryParams]="{ sortBy: 'rating' }" class="text-decoration-none fw-semibold d-inline-flex align-items-center gap-1 text-primary-blue">
+          <span>Top Rated Gear</span> <i class="bi bi-arrow-right"></i>
         </a>
       </div>
 
       <div class="row g-4">
-        @for (product of newArrivals(); track product.id) {
-          <div class="col-12 col-sm-6 col-lg-4">
-            <app-product-card [product]="product"></app-product-card>
+        @for (product of bestSellers(); track product.id) {
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+            <app-product-card
+              [product]="product"
+              (addedToCart)="onProductAdded($event)"
+              (toggledWishlist)="onWishlistToggled($event)"
+            ></app-product-card>
           </div>
         }
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Value Proposition Highlights -->
+  <section class="py-5 bg-white border-top">
+    <div class="container-xl">
+      <div class="row g-4">
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="value-feature-card p-4 rounded-3 h-100 border text-center">
+            <div class="feature-icon mx-auto mb-3">
+              <i class="bi bi-truck text-primary-blue"></i>
+            </div>
+            <h6 class="fw-bold text-navy mb-1">Free Express Delivery</h6>
+            <p class="text-muted text-xs mb-0">Complimentary 2-day tracked shipping on all orders over $150.</p>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="value-feature-card p-4 rounded-3 h-100 border text-center">
+            <div class="feature-icon mx-auto mb-3">
+              <i class="bi bi-shield-check text-primary-blue"></i>
+            </div>
+            <h6 class="fw-bold text-navy mb-1">2-Year Official Warranty</h6>
+            <p class="text-muted text-xs mb-0">Direct manufacturer-backed hardware coverage on all devices.</p>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="value-feature-card p-4 rounded-3 h-100 border text-center">
+            <div class="feature-icon mx-auto mb-3">
+              <i class="bi bi-arrow-counterclockwise text-primary-blue"></i>
+            </div>
+            <h6 class="fw-bold text-navy mb-1">30-Day Easy Returns</h6>
+            <p class="text-muted text-xs mb-0">Hassle-free replacement or full money-back guarantee.</p>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-lg-3">
+          <div class="value-feature-card p-4 rounded-3 h-100 border text-center">
+            <div class="feature-icon mx-auto mb-3">
+              <i class="bi bi-headset text-primary-blue"></i>
+            </div>
+            <h6 class="fw-bold text-navy mb-1">24/7 Expert Support</h6>
+            <p class="text-muted text-xs mb-0">Dedicated electronics specialists ready to assist your setup.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Newsletter Subscription UI -->
+  <section class="py-5 bg-subtle-section border-top">
+    <div class="container-xl py-lg-4">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+          <div class="card newsletter-card p-4 p-md-5 border-0 rounded-4 shadow-sm text-center">
+            <div class="newsletter-icon-circle mx-auto mb-3">
+              <i class="bi bi-envelope-paper-heart text-primary-blue"></i>
+            </div>
+            <h2 class="fw-extrabold text-navy mb-2">Stay Ahead Of The Tech Curve</h2>
+            <p class="text-muted text-sm max-w-550 mx-auto mb-4">
+              Subscribe to the ElectroHub newsletter for early access to limited flagship drops, unadvertised discounts, and architectural hardware benchmarks.
+            </p>
+
+            @if (newsletterSubmitted()) {
+              <div class="alert alert-success d-flex align-items-center justify-content-center gap-2 py-3 max-w-550 mx-auto" role="alert">
+                <i class="bi bi-check-circle-fill fs-5"></i>
+                <div class="text-sm">
+                  <strong>You're subscribed!</strong> Check your email for an exclusive 10% welcome coupon.
+                </div>
+              </div>
+            } @else {
+              <form (submit)="onNewsletterSubmit($event)" class="max-w-550 mx-auto">
+                @if (newsletterError()) {
+                  <div class="alert alert-danger py-2 text-xs mb-3 text-start">
+                    {{ newsletterError() }}
+                  </div>
+                }
+                <div class="input-group input-group-lg shadow-xs">
+                  <input
+                    type="email"
+                    class="form-control"
+                    placeholder="Enter your corporate or personal email..."
+                    [(ngModel)]="newsletterEmail"
+                    name="homeNewsletter"
+                    required
+                  />
+                  <button class="btn btn-primary-blue px-4" type="submit">
+                    Subscribe
+                  </button>
+                </div>
+                <div class="d-flex align-items-center justify-content-center gap-3 mt-3 text-xs text-muted">
+                  <span><i class="bi bi-check2 text-success me-1"></i>No spam ever</span>
+                  <span>&bull;</span>
+                  <span><i class="bi bi-lock text-muted me-1"></i>256-bit data encryption</span>
+                  <span>&bull;</span>
+                  <span>Unsubscribe anytime</span>
+                </div>
+              </form>
+            }
+          </div>
+        </div>
       </div>
     </div>
   </section>

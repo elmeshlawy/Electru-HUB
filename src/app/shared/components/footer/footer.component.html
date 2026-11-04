@@ -1,131 +1,106 @@
 <footer class="eh-footer bg-navy-950 text-white-50 pt-5 pb-4">
-  <!-- Value Proposition Highlights -->
-  <div class="container-xl pb-5 mb-4 border-bottom border-secondary border-opacity-25">
-    <div class="row g-4">
-      <div class="col-6 col-md-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="value-icon"><i class="bi bi-box-seam"></i></div>
-          <div>
-            <h6 class="text-white mb-0 fw-bold">Free Express Delivery</h6>
-            <small class="text-white-50">On all orders above $150</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="value-icon"><i class="bi bi-arrow-repeat"></i></div>
-          <div>
-            <h6 class="text-white mb-0 fw-bold">30-Day Easy Returns</h6>
-            <small class="text-white-50">Hassle-free money back</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="value-icon"><i class="bi bi-shield-check"></i></div>
-          <div>
-            <h6 class="text-white mb-0 fw-bold">2-Year Official Warranty</h6>
-            <small class="text-white-50">Certified authentic devices</small>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="d-flex align-items-center gap-3">
-          <div class="value-icon"><i class="bi bi-headset"></i></div>
-          <div>
-            <h6 class="text-white mb-0 fw-bold">24/7 Expert Support</h6>
-            <small class="text-white-50">Dedicated hardware specialists</small>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main Links & Newsletter -->
   <div class="container-xl">
     <div class="row g-4 mb-5">
-      <!-- Col 1: Brand Info -->
+      <!-- Col 1: Brand Info & Social Media -->
       <div class="col-12 col-lg-4">
         <div class="d-flex align-items-center gap-2 mb-3">
           <div class="brand-icon-box-sm">
             <i class="bi bi-cpu-fill"></i>
           </div>
-          <span class="fs-4 fw-bold text-white">Electro<span class="text-info">Hub</span></span>
+          <span class="fs-4 fw-bold text-white">Electro<span class="text-primary-blue">Hub</span></span>
         </div>
-        <p class="text-white-50 pe-lg-4 mb-4">
-          ElectroHub is the premier consumer technology and electronics platform delivering authentic flagship devices, ultra-fast shipping, and unmatched customer service.
+        <p class="text-white-50 pe-lg-4 mb-4 text-sm">
+          ElectroHub is the premier destination for high-performance laptops, QD-OLED monitors, audiophile acoustics, and flagship mobile devices backed by official 2-year warranty and express delivery.
         </p>
-        <div class="d-flex align-items-center gap-2">
-          <a href="#" class="social-btn" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" class="social-btn" aria-label="GitHub"><i class="bi bi-github"></i></a>
-          <a href="#" class="social-btn" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-          <a href="#" class="social-btn" aria-label="Discord"><i class="bi bi-discord"></i></a>
+
+        <!-- Social Media Icons -->
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Twitter">
+            <i class="bi bi-twitter-x"></i>
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub">
+            <i class="bi bi-github"></i>
+          </a>
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn">
+            <i class="bi bi-linkedin"></i>
+          </a>
+          <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Discord">
+            <i class="bi bi-discord"></i>
+          </a>
+          <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="YouTube">
+            <i class="bi bi-youtube"></i>
+          </a>
         </div>
       </div>
 
-      <!-- Col 2: Categories -->
+      <!-- Col 2: Categories (6 categories) -->
       <div class="col-6 col-md-3 col-lg-2">
-        <h6 class="text-white fw-bold mb-3">Shop Categories</h6>
+        <h6 class="text-white fw-bold mb-3 text-sm text-uppercase tracking-wider">Categories</h6>
         <ul class="list-unstyled footer-links">
-          <li><a routerLink="/products" [queryParams]="{ category: 'cat-laptops' }">Laptops & PCs</a></li>
-          <li><a routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }">Smartphones</a></li>
-          <li><a routerLink="/products" [queryParams]="{ category: 'cat-audio' }">Acoustics & Audio</a></li>
-          <li><a routerLink="/products" [queryParams]="{ category: 'cat-gaming' }">Gaming & Peripherals</a></li>
-          <li><a routerLink="/products" [queryParams]="{ category: 'cat-wearables' }">Smart Wearables</a></li>
-          <li><a routerLink="/products">All Categories</a></li>
+          @for (cat of categories(); track cat.id) {
+            <li>
+              <a [routerLink]="['/products']" [queryParams]="{ category: cat.id }">
+                {{ cat.name }}
+              </a>
+            </li>
+          }
+          <li><a routerLink="/products">All Categories &rarr;</a></li>
         </ul>
       </div>
 
-      <!-- Col 3: Customer Care -->
+      <!-- Col 3: Quick Links -->
       <div class="col-6 col-md-3 col-lg-2">
-        <h6 class="text-white fw-bold mb-3">Customer Care</h6>
+        <h6 class="text-white fw-bold mb-3 text-sm text-uppercase tracking-wider">Quick Links</h6>
         <ul class="list-unstyled footer-links">
-          <li><a routerLink="/orders">Track Your Order</a></li>
+          <li><a routerLink="/">Home</a></li>
+          <li><a routerLink="/products">Catalog</a></li>
           <li><a routerLink="/cart">Shopping Cart</a></li>
-          <li><a routerLink="/wishlist">Wishlist</a></li>
-          <li><a routerLink="/profile">Account Settings</a></li>
-          <li><a href="#returns">Returns & Warranty</a></li>
-          <li><a href="#support">Help Center</a></li>
+          <li><a routerLink="/wishlist">Saved Wishlist</a></li>
+          <li><a routerLink="/products" [queryParams]="{ sortBy: 'rating' }">Best Sellers</a></li>
         </ul>
       </div>
 
-      <!-- Col 4: Newsletter -->
+      <!-- Col 4: Customer Support -->
       <div class="col-12 col-md-6 col-lg-4">
-        <h6 class="text-white fw-bold mb-3">Stay In The Tech Loop</h6>
-        <p class="text-white-50 mb-3">
-          Subscribe to get notified of limited flagship drops, exclusive member discounts, and architectural hardware launches.
-        </p>
+        <h6 class="text-white fw-bold mb-3 text-sm text-uppercase tracking-wider">Customer Support</h6>
+        <ul class="list-unstyled footer-links mb-4 d-flex flex-wrap gap-x-4">
+          <li class="w-50"><a routerLink="/orders"><i class="bi bi-truck me-1"></i> Track Order</a></li>
+          <li class="w-50"><a routerLink="/profile"><i class="bi bi-person me-1"></i> Account</a></li>
+          <li class="w-50"><a routerLink="/profile"><i class="bi bi-shield-check me-1"></i> Warranty Policy</a></li>
+          <li class="w-50"><a routerLink="/orders"><i class="bi bi-arrow-repeat me-1"></i> Easy Returns</a></li>
+        </ul>
 
+        <!-- Newsletter in Footer -->
+        <h6 class="text-white fw-bold mb-2 text-xs text-uppercase tracking-wider">Join ElectroHub VIP Club</h6>
         @if (newsletterSubscribed) {
-          <div class="alert alert-success d-flex align-items-center gap-2 py-2" role="alert">
+          <div class="alert alert-success d-flex align-items-center gap-2 py-2 text-xs mb-0" role="alert">
             <i class="bi bi-check-circle-fill"></i>
-            <div>Thanks for subscribing! Check your inbox soon.</div>
+            <div>Thanks for joining! Your 10% coupon has been generated.</div>
           </div>
         } @else {
-          <form (submit)="onSubscribeNewsletter($event)" class="d-flex flex-column flex-sm-row gap-2">
+          <form (submit)="onSubscribeNewsletter($event)" class="d-flex gap-2">
             <input
               type="email"
-              class="form-control bg-navy-800 text-white border-0 py-2"
+              class="form-control bg-navy-800 text-white border-0 py-2 text-sm"
               placeholder="Enter your email"
               [(ngModel)]="newsletterEmail"
-              name="newsletterEmail"
+              name="footerNewsletter"
               required
             />
-            <button class="btn btn-primary-blue text-nowrap" type="submit">
-              Subscribe
+            <button class="btn btn-primary-blue text-nowrap text-sm" type="submit">
+              Join
             </button>
           </form>
         }
-        <small class="text-white-50 d-block mt-2">Zero spam. Unsubscribe at any time.</small>
       </div>
     </div>
 
     <!-- Bottom Copyright & Badges -->
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-center pt-4 border-top border-secondary border-opacity-25 gap-3">
       <div class="text-white-50 text-xs">
-        &copy; {{ currentYear }} ElectroHub Inc. Built with Angular 22 & Bootstrap. All rights reserved.
+        &copy; {{ currentYear }} ElectroHub Inc. All rights reserved. Premium Electronics & Modern Tech.
       </div>
-      <div class="d-flex align-items-center gap-3 text-white-50">
+      <div class="d-flex align-items-center gap-2 text-white-50 text-xs">
         <span class="badge bg-navy-800 px-2 py-1"><i class="bi bi-credit-card me-1"></i> Visa</span>
         <span class="badge bg-navy-800 px-2 py-1"><i class="bi bi-credit-card-2-front me-1"></i> Mastercard</span>
         <span class="badge bg-navy-800 px-2 py-1"><i class="bi bi-paypal me-1"></i> PayPal</span>

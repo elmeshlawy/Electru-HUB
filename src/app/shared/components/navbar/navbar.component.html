@@ -2,7 +2,7 @@
 <div class="eh-topbar py-1 px-3 d-none d-md-block">
   <div class="container-xl d-flex justify-content-between align-items-center text-xs">
     <div class="d-flex align-items-center gap-3">
-      <span><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Special Offer: Free Express Shipping over $150</span>
+      <span><i class="bi bi-lightning-charge-fill text-warning me-1"></i> Special Offer: Free Express Shipping on orders over $150</span>
       <span class="text-white-50">|</span>
       <span><i class="bi bi-shield-check text-info me-1"></i> 2-Year Official Warranty Guaranteed</span>
     </div>
@@ -26,18 +26,63 @@
         <span class="brand-text">Electro<span class="text-primary-blue">Hub</span></span>
       </a>
 
-      <!-- Mobile Toggle Button -->
-      <button
-        class="navbar-toggler border-0 shadow-none p-1"
-        type="button"
-        (click)="toggleMobileMenu()"
-        aria-label="Toggle navigation"
-      >
-        <i class="bi" [class.bi-list]="!isMobileMenuOpen()" [class.bi-x-lg]="isMobileMenuOpen()" style="font-size: 1.5rem;"></i>
-      </button>
+      <!-- Desktop Nav Links: Home, Products, Categories Dropdown -->
+      <div class="d-none d-lg-flex align-items-center ms-3 gap-1">
+        <a class="nav-link-item" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          Home
+        </a>
+        <a class="nav-link-item" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          Products
+        </a>
+
+        <!-- Categories Dropdown -->
+        <div class="position-relative categories-dropdown-container">
+          <button
+            type="button"
+            class="nav-link-item d-flex align-items-center gap-1 border-0 bg-transparent"
+            [class.active]="isCategoriesDropdownOpen()"
+            (click)="toggleCategoriesDropdown($event)"
+            aria-expanded="false"
+          >
+            <span>Categories</span>
+            <i class="bi bi-chevron-down text-xs transition-icon" [class.rotate-180]="isCategoriesDropdownOpen()"></i>
+          </button>
+
+          <!-- Dropdown Menu -->
+          @if (isCategoriesDropdownOpen()) {
+            <div class="dropdown-menu show categories-mega-menu shadow-lg border p-3 mt-2" (click)="$event.stopPropagation()">
+              <div class="row g-2" style="min-width: 480px;">
+                @for (cat of categories(); track cat.id) {
+                  <div class="col-6">
+                    <a
+                      [routerLink]="['/products']"
+                      [queryParams]="{ category: cat.id }"
+                      class="dropdown-cat-card d-flex align-items-center gap-3 p-2 rounded text-decoration-none"
+                      (click)="closeCategoriesDropdown()"
+                    >
+                      <div class="cat-card-icon">
+                        <i class="bi" [class]="cat.icon ?? 'bi-box'"></i>
+                      </div>
+                      <div>
+                        <div class="fw-semibold text-navy text-sm">{{ cat.name }}</div>
+                        <small class="text-muted text-xs">{{ cat.productCount }} items</small>
+                      </div>
+                    </a>
+                  </div>
+                }
+              </div>
+              <div class="pt-2 mt-2 border-top text-center">
+                <a routerLink="/products" class="text-primary-blue text-xs fw-semibold text-decoration-none" (click)="closeCategoriesDropdown()">
+                  View All Products & Categories &rarr;
+                </a>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
 
       <!-- Center Search Bar (Desktop) -->
-      <div class="d-none d-lg-flex flex-grow-1 mx-4 max-w-550">
+      <div class="d-none d-lg-flex flex-grow-1 mx-4 max-w-450">
         <form class="w-100 position-relative" (submit)="onSearch($event)">
           <div class="input-group">
             <span class="input-group-text bg-light border-end-0 text-muted ps-3">
@@ -46,19 +91,29 @@
             <input
               type="text"
               class="form-control bg-light border-start-0 py-2 ps-1"
-              placeholder="Search laptops, flagships, audio, gaming..."
+              placeholder="Search laptops, flagships, monitors..."
               [(ngModel)]="searchQuery"
               name="search"
             />
-            <button class="btn btn-primary-blue px-4" type="submit">
+            <button class="btn btn-primary-blue px-3" type="submit">
               Search
             </button>
           </div>
         </form>
       </div>
 
+      <!-- Mobile Toggle Button -->
+      <button
+        class="navbar-toggler border-0 shadow-none p-1 ms-auto d-lg-none me-2"
+        type="button"
+        (click)="toggleMobileMenu()"
+        aria-label="Toggle navigation"
+      >
+        <i class="bi" [class.bi-list]="!isMobileMenuOpen()" [class.bi-x-lg]="isMobileMenuOpen()" style="font-size: 1.6rem;"></i>
+      </button>
+
       <!-- Action Icons (Wishlist, Cart, Profile) -->
-      <div class="d-none d-lg-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2 gap-lg-3">
         <!-- Wishlist -->
         <a routerLink="/wishlist" class="action-btn position-relative" title="Wishlist">
           <i class="bi bi-heart fs-5"></i>
@@ -84,111 +139,66 @@
           </div>
         </a>
 
-        <div class="vr my-2 text-muted"></div>
+        <div class="vr my-2 text-muted d-none d-lg-block"></div>
 
-        <!-- User Authentication -->
-        @if (authService.isAuthenticated()) {
-          <div class="dropdown">
-            <button
-              class="btn btn-user-menu d-flex align-items-center gap-2 dropdown-toggle"
-              type="button"
-              id="userMenuButton"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              @if (authService.currentUser()?.avatarUrl) {
-                <img [src]="authService.currentUser()?.avatarUrl" alt="Avatar" class="user-avatar" />
-              } @else {
-                <i class="bi bi-person-circle fs-5 text-primary-blue"></i>
-              }
-              <div class="d-flex flex-column text-start">
-                <span class="fw-semibold text-sm">{{ authService.currentUser()?.firstName }}</span>
-                <span class="text-xs text-muted">Account</span>
-              </div>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 p-2" aria-labelledby="userMenuButton">
-              <li>
-                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/profile">
-                  <i class="bi bi-person text-primary-blue"></i> My Profile
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/orders">
-                  <i class="bi bi-box-seam text-primary-blue"></i> Order History
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/wishlist">
-                  <i class="bi bi-heart text-danger"></i> Saved Items
-                </a>
-              </li>
-              <li><hr class="dropdown-divider my-1"></li>
-              <li>
-                <button class="dropdown-item rounded py-2 text-danger d-flex align-items-center gap-2" (click)="onLogout()">
-                  <i class="bi bi-box-arrow-right"></i> Sign Out
-                </button>
-              </li>
-            </ul>
-          </div>
-        } @else {
-          <a routerLink="/auth/login" class="btn btn-primary-blue py-2 px-3">
-            <i class="bi bi-box-arrow-in-right"></i> Sign In
-          </a>
-        }
-      </div>
-    </div>
-  </nav>
-
-  <!-- Secondary Navigation: Categories and Links (Desktop) -->
-  <nav class="sub-nav bg-white border-bottom d-none d-lg-block">
-    <div class="container-xl d-flex align-items-center justify-content-between">
-      <ul class="nav category-nav py-2 gap-1">
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            <i class="bi bi-house me-1"></i> Home
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-            <i class="bi bi-grid me-1"></i> All Products
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-laptops' }">
-            Laptops & PCs
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }">
-            Smartphones
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-audio' }">
-            Audio & ANC
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-gaming' }">
-            Gaming & VR
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link py-1 px-3" routerLink="/products" [queryParams]="{ category: 'cat-wearables' }">
-            Wearables
-          </a>
-        </li>
-      </ul>
-      <div class="d-flex align-items-center gap-2">
-        <span class="badge bg-danger-subtle text-danger fw-semibold px-2 py-1">Hot Deals</span>
-        <span class="text-xs text-muted">Up to 40% Off Select Gear</span>
+        <!-- User Authentication (Desktop) -->
+        <div class="d-none d-lg-block">
+          @if (authService.isAuthenticated()) {
+            <div class="dropdown">
+              <button
+                class="btn btn-user-menu d-flex align-items-center gap-2 dropdown-toggle"
+                type="button"
+                id="userMenuButton"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                @if (authService.currentUser()?.avatarUrl) {
+                  <img [src]="authService.currentUser()?.avatarUrl" alt="Avatar" class="user-avatar" />
+                } @else {
+                  <i class="bi bi-person-circle fs-5 text-primary-blue"></i>
+                }
+                <div class="d-flex flex-column text-start">
+                  <span class="fw-semibold text-sm">{{ authService.currentUser()?.firstName }}</span>
+                  <span class="text-xs text-muted">Account</span>
+                </div>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 mt-2 p-2" aria-labelledby="userMenuButton">
+                <li>
+                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/profile">
+                    <i class="bi bi-person text-primary-blue"></i> My Profile
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/orders">
+                    <i class="bi bi-box-seam text-primary-blue"></i> Order History
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item rounded py-2 d-flex align-items-center gap-2" routerLink="/wishlist">
+                    <i class="bi bi-heart text-danger"></i> Saved Items
+                  </a>
+                </li>
+                <li><hr class="dropdown-divider my-1"></li>
+                <li>
+                  <button class="dropdown-item rounded py-2 text-danger d-flex align-items-center gap-2" (click)="onLogout()">
+                    <i class="bi bi-box-arrow-right"></i> Sign Out
+                  </button>
+                </li>
+              </ul>
+            </div>
+          } @else {
+            <a routerLink="/auth/login" class="btn btn-primary-blue py-2 px-3 text-sm">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+            </a>
+          }
+        </div>
       </div>
     </div>
   </nav>
 
   <!-- Mobile Collapsible Menu -->
   @if (isMobileMenuOpen()) {
-    <div class="mobile-drawer d-lg-none bg-white border-bottom p-3">
+    <div class="mobile-drawer d-lg-none bg-white border-bottom p-3 shadow-md">
       <!-- Search inside mobile -->
       <form class="mb-3" (submit)="onSearch($event)">
         <div class="input-group">
@@ -230,40 +240,65 @@
       <!-- Navigation Links -->
       <ul class="list-unstyled mb-0">
         <li class="py-2 border-bottom">
-          <a routerLink="/" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-medium">
-            <span><i class="bi bi-house me-2"></i> Home</span>
+          <a routerLink="/" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-semibold">
+            <span><i class="bi bi-house me-2 text-primary-blue"></i> Home</span>
             <i class="bi bi-chevron-right text-muted text-xs"></i>
           </a>
         </li>
         <li class="py-2 border-bottom">
-          <a routerLink="/products" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-medium">
-            <span><i class="bi bi-grid me-2"></i> All Products</span>
+          <a routerLink="/products" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-semibold">
+            <span><i class="bi bi-grid me-2 text-primary-blue"></i> All Products</span>
             <i class="bi bi-chevron-right text-muted text-xs"></i>
           </a>
         </li>
+
+        <!-- Mobile Categories Accordion -->
         <li class="py-2 border-bottom">
-          <a routerLink="/products" [queryParams]="{ category: 'cat-laptops' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
-            <span><i class="bi bi-laptop me-2"></i> Laptops & PCs</span>
+          <div
+            class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-semibold cursor-pointer"
+            (click)="toggleMobileCategories()"
+          >
+            <span><i class="bi bi-collection me-2 text-primary-blue"></i> Categories</span>
+            <i class="bi bi-chevron-down text-muted text-xs transition-icon" [class.rotate-180]="isMobileCategoriesOpen()"></i>
+          </div>
+
+          @if (isMobileCategoriesOpen()) {
+            <ul class="list-unstyled ps-4 pt-2 mb-0">
+              @for (cat of categories(); track cat.id) {
+                <li class="py-1">
+                  <a
+                    [routerLink]="['/products']"
+                    [queryParams]="{ category: cat.id }"
+                    (click)="closeMobileMenu()"
+                    class="d-flex align-items-center justify-content-between text-secondary text-decoration-none text-sm py-1"
+                  >
+                    <span><i class="bi me-2 text-xs" [class]="cat.icon ?? 'bi-box'"></i> {{ cat.name }}</span>
+                    <span class="badge bg-light text-muted text-xs">{{ cat.productCount }}</span>
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </li>
+
+        <li class="py-2 border-bottom">
+          <a routerLink="/orders" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none fw-semibold">
+            <span><i class="bi bi-truck me-2 text-primary-blue"></i> My Orders</span>
             <i class="bi bi-chevron-right text-muted text-xs"></i>
           </a>
         </li>
-        <li class="py-2 border-bottom">
-          <a routerLink="/products" [queryParams]="{ category: 'cat-smartphones' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
-            <span><i class="bi bi-phone me-2"></i> Smartphones</span>
-            <i class="bi bi-chevron-right text-muted text-xs"></i>
-          </a>
-        </li>
-        <li class="py-2 border-bottom">
-          <a routerLink="/products" [queryParams]="{ category: 'cat-audio' }" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
-            <span><i class="bi bi-headphones me-2"></i> Audio & Acoustics</span>
-            <i class="bi bi-chevron-right text-muted text-xs"></i>
-          </a>
-        </li>
-        <li class="py-2 border-bottom">
-          <a routerLink="/orders" (click)="closeMobileMenu()" class="d-flex align-items-center justify-content-between text-navy text-decoration-none">
-            <span><i class="bi bi-truck me-2"></i> My Orders</span>
-            <i class="bi bi-chevron-right text-muted text-xs"></i>
-          </a>
+
+        <!-- Auth in mobile -->
+        <li class="pt-3">
+          @if (authService.isAuthenticated()) {
+            <button class="btn btn-outline-danger w-100 btn-sm" (click)="onLogout(); closeMobileMenu()">
+              <i class="bi bi-box-arrow-right me-1"></i> Sign Out ({{ authService.currentUser()?.firstName }})
+            </button>
+          } @else {
+            <a routerLink="/auth/login" (click)="closeMobileMenu()" class="btn btn-primary-blue w-100 btn-sm">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Sign In to ElectroHub
+            </a>
+          }
         </li>
       </ul>
     </div>

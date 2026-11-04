@@ -1,20 +1,20 @@
-<div class="eh-card product-card h-100 d-flex flex-column">
-  <!-- Card Header / Media -->
+<div class="eh-card product-card h-100 d-flex flex-column position-relative">
+  <!-- Card Media Wrapper -->
   <div class="card-media-wrapper position-relative overflow-hidden">
-    <!-- Badges -->
+    <!-- Badges Group -->
     <div class="product-badge-group position-absolute top-0 start-0 m-3 d-flex flex-column gap-1 z-2">
       @if (product().discountPercentage && product().discountPercentage! > 0) {
-        <span class="badge badge-sale">
+        <span class="badge badge-sale shadow-xs">
           -{{ product().discountPercentage }}% OFF
         </span>
       }
       @if (product().isNewArrival) {
-        <span class="badge badge-tech">
+        <span class="badge badge-tech shadow-xs">
           NEW
         </span>
       }
       @if (product().isBestSeller && !product().isNewArrival) {
-        <span class="badge bg-warning text-dark fw-bold" style="font-size: 0.72rem; border-radius: 9999px;">
+        <span class="badge bg-navy-800 text-white shadow-xs" style="font-size: 0.72rem; border-radius: 9999px;">
           BEST SELLER
         </span>
       }
@@ -39,6 +39,7 @@
         [alt]="product().name"
         class="img-fluid product-image"
         loading="lazy"
+        (error)="onImageError($event)"
       />
     </a>
   </div>
@@ -47,8 +48,8 @@
   <div class="card-body p-4 d-flex flex-column flex-grow-1">
     <!-- Brand & Category -->
     <div class="d-flex justify-content-between align-items-center mb-2">
-      <span class="text-xs fw-semibold text-uppercase text-muted">{{ product().brand }}</span>
-      <span class="text-xs text-primary fw-medium">{{ product().categoryName }}</span>
+      <span class="text-xs fw-bold text-uppercase text-muted tracking-wider">{{ product().brand }}</span>
+      <span class="text-xs text-primary-blue fw-semibold">{{ product().categoryName }}</span>
     </div>
 
     <!-- Product Name -->
@@ -59,9 +60,13 @@
     </h3>
 
     <!-- Rating & Reviews -->
-    <div class="d-flex align-items-center gap-1 mb-3">
+    <div class="d-flex align-items-center gap-2 mb-3">
       <div class="rating-stars text-warning text-xs">
         <i class="bi bi-star-fill"></i>
+        <i class="bi bi-star-fill ms-0.5"></i>
+        <i class="bi bi-star-fill ms-0.5"></i>
+        <i class="bi bi-star-fill ms-0.5"></i>
+        <i class="bi bi-star-half ms-0.5"></i>
       </div>
       <span class="fw-bold text-xs text-navy">{{ product().rating }}</span>
       <span class="text-muted text-xs">({{ product().reviewCount }})</span>
@@ -87,23 +92,23 @@
         </div>
         <div class="stock-status text-xs">
           @if (product().inStock && product().stock > 0) {
-            <span class="text-success"><i class="bi bi-check2-circle me-1"></i>In Stock</span>
+            <span class="text-success fw-medium"><i class="bi bi-check2-circle me-1"></i>In Stock</span>
           } @else {
-            <span class="text-danger"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
+            <span class="text-danger fw-medium"><i class="bi bi-x-circle me-1"></i>Out of Stock</span>
           }
         </div>
       </div>
 
-      <!-- Quick Add to Cart -->
+      <!-- Quick Add to Cart Button -->
       <button
         type="button"
-        class="btn btn-sm btn-primary-blue rounded-circle p-2 cart-quick-btn"
-        [class.btn-success]="isInCart()"
+        class="btn btn-sm btn-primary-blue rounded-circle cart-quick-btn"
+        [class.btn-success]="justAdded() || isInCart()"
         (click)="onAddToCart($event)"
-        [title]="isInCart() ? 'Added to Cart' : 'Add to Cart'"
+        [title]="justAdded() ? 'Added to Cart!' : (isInCart() ? 'In Cart' : 'Add to Cart')"
         aria-label="Add to cart"
       >
-        <i class="bi" [class.bi-check-lg]="isInCart()" [class.bi-cart-plus]="!isInCart()"></i>
+        <i class="bi" [class.bi-check-lg]="justAdded() || isInCart()" [class.bi-cart-plus]="!justAdded() && !isInCart()"></i>
       </button>
     </div>
   </div>
