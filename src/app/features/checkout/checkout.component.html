@@ -1,5 +1,6 @@
 <div class="checkout-page py-4">
   <div class="container-xl">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -8,108 +9,408 @@
       </ol>
     </nav>
 
-    <h1 class="h3 fw-bold text-navy mb-4">Secure Checkout</h1>
+    <!-- State 1: Order Confirmation Screen -->
+    @if (confirmedOrder(); as order) {
+      <div class="order-confirmation-wrapper my-4">
+        <!-- Success Celebration Banner -->
+        <div class="card bg-white p-4 p-md-5 text-center border rounded-4 shadow-sm mb-4">
+          <div class="order-success-icon mx-auto mb-3">
+            <i class="bi bi-check2"></i>
+          </div>
+          <span class="badge bg-success-subtle text-success text-uppercase fw-bold px-3 py-1 mb-2 align-self-center">
+            Order Placed Successfully
+          </span>
+          <h2 class="fw-bold text-navy mb-2">Thank you, {{ order.customerName }}!</h2>
+          <p class="text-secondary max-w-500 mx-auto mb-4">
+            We've received your order and our automated warehouse has started preparing your gear. A confirmation email has been dispatched to <strong>{{ order.customerEmail }}</strong>.
+          </p>
 
-    @if (orderSuccess(); as orderNum) {
-      <div class="card bg-white p-5 text-center border rounded-4 shadow-sm my-4">
-        <div class="order-success-icon mx-auto mb-3">
-          <i class="bi bi-check-lg"></i>
+          <!-- Order Meta Highlights -->
+          <div class="row g-3 justify-content-center text-start text-xs border rounded-3 p-3 bg-light max-w-700 mx-auto mb-4">
+            <div class="col-6 col-md-3">
+              <span class="text-muted d-block">Order Number</span>
+              <strong class="text-primary-blue fs-6">{{ order.orderNumber }}</strong>
+            </div>
+            <div class="col-6 col-md-3">
+              <span class="text-muted d-block">Date Placed</span>
+              <strong class="text-navy">{{ order.createdAt | date:'mediumDate' }}</strong>
+            </div>
+            <div class="col-6 col-md-3">
+              <span class="text-muted d-block">Tracking ID</span>
+              <strong class="text-navy">{{ order.trackingNumber }}</strong>
+            </div>
+            <div class="col-6 col-md-3">
+              <span class="text-muted d-block">Estimated Arrival</span>
+              <strong class="text-success">{{ order.estimatedDelivery | date:'mediumDate' }}</strong>
+            </div>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-center gap-3">
+            <a routerLink="/orders" class="btn btn-primary-blue d-flex align-items-center gap-2">
+              <i class="bi bi-box-seam"></i>
+              <span>View in Order History</span>
+            </a>
+            <a routerLink="/products" class="btn btn-outline-navy d-flex align-items-center gap-2">
+              <span>Continue Shopping</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
         </div>
-        <h2 class="fw-bold text-navy mb-2">Order Confirmed!</h2>
-        <p class="text-secondary max-w-500 mx-auto mb-3">
-          Thank you for choosing ElectroHub! Your order <strong class="text-navy">{{ orderNum }}</strong> has been placed and is being prepared for dispatch.
-        </p>
-        <div class="d-flex justify-content-center gap-3 mt-3">
-          <a routerLink="/orders" class="btn btn-primary-blue">
-            <i class="bi bi-box-seam me-1"></i> View Order Details
-          </a>
-          <a routerLink="/products" class="btn btn-outline-navy">
-            Continue Shopping
-          </a>
-        </div>
-      </div>
-    } @else if (items().length === 0) {
-      <div class="card bg-white p-5 text-center border rounded-3">
-        <i class="bi bi-bag-x text-muted" style="font-size: 3rem;"></i>
-        <h4 class="fw-bold text-navy mt-3">Your cart is empty</h4>
-        <p class="text-muted mb-4">Please add products to your cart before proceeding to checkout.</p>
-        <div>
-          <a routerLink="/products" class="btn btn-primary-blue">Return to Shop</a>
-        </div>
-      </div>
-    } @else {
-      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+
+        <!-- Order Summary & Shipping Details Breakdown -->
         <div class="row g-4">
-          <!-- Left Column: Shipping & Payment Details -->
-          <div class="col-12 col-lg-8">
-            <!-- Contact & Shipping -->
-            <div class="card bg-white p-4 border rounded-3 mb-4 shadow-xs">
-              <h5 class="fw-bold text-navy mb-3"><i class="bi bi-geo-alt me-2 text-primary-blue"></i> Shipping Destination</h5>
-              <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label text-xs fw-semibold">First Name</label>
-                  <input type="text" class="form-control" formControlName="firstName" />
+          <!-- Ordered Items Table -->
+          <div class="col-12 col-lg-7">
+            <div class="card bg-white p-4 border rounded-4 shadow-xs h-100">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                <i class="bi bi-bag-check me-2 text-primary-blue"></i> Ordered Items ({{ order.items.length }})
+              </h5>
+              <div class="d-flex flex-column gap-3 mb-3">
+                @for (item of order.items; track item.productId) {
+                  <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
+                    <div class="d-flex align-items-center gap-3">
+                      <img
+                        [src]="item.productImage"
+                        [alt]="item.productName"
+                        class="confirmation-thumb rounded border"
+                      />
+                      <div>
+                        <h6 class="text-navy fw-semibold mb-1 text-sm">{{ item.productName }}</h6>
+                        <span class="text-muted text-xs">
+                          Quantity: {{ item.quantity }} &times; {{ item.unitPrice | currencyFormat }}
+                        </span>
+                      </div>
+                    </div>
+                    <span class="fw-bold text-navy text-sm">{{ item.lineTotal | currencyFormat }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Cost Totals -->
+              <div class="pt-2 border-top">
+                <div class="d-flex justify-content-between text-sm mb-1">
+                  <span class="text-muted">Subtotal</span>
+                  <span class="text-navy fw-medium">{{ order.subtotal | currencyFormat }}</span>
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label text-xs fw-semibold">Last Name</label>
-                  <input type="text" class="form-control" formControlName="lastName" />
+                <div class="d-flex justify-content-between text-sm mb-1">
+                  <span class="text-muted">Shipping ({{ order.shippingMethod }})</span>
+                  @if (order.shippingCost === 0) {
+                    <span class="text-success fw-bold">FREE</span>
+                  } @else {
+                    <span class="text-navy fw-medium">{{ order.shippingCost | currencyFormat }}</span>
+                  }
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label text-xs fw-semibold">Email Address</label>
-                  <input type="email" class="form-control" formControlName="email" />
+                <div class="d-flex justify-content-between text-sm mb-2">
+                  <span class="text-muted">Estimated Tax (8%)</span>
+                  <span class="text-navy fw-medium">{{ order.tax | currencyFormat }}</span>
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label text-xs fw-semibold">Phone Number</label>
-                  <input type="tel" class="form-control" formControlName="phone" />
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                  <strong class="fs-5 text-navy">Total Paid</strong>
+                  <strong class="fs-4 text-primary-blue">{{ order.total | currencyFormat }}</strong>
                 </div>
-                <div class="col-12">
-                  <label class="form-label text-xs fw-semibold">Street Address</label>
-                  <input type="text" class="form-control" formControlName="streetAddress" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping and Payment Info -->
+          <div class="col-12 col-lg-5">
+            <div class="card bg-white p-4 border rounded-4 shadow-xs mb-4">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                <i class="bi bi-geo-alt me-2 text-primary-blue"></i> Delivery Destination
+              </h5>
+              <div class="text-sm">
+                <strong class="text-navy d-block mb-1">{{ order.shippingAddress.fullName }}</strong>
+                <div class="text-secondary mb-2">
+                  {{ order.shippingAddress.streetAddress }}
+                  @if (order.shippingAddress.apartmentOrSuite) {
+                    , {{ order.shippingAddress.apartmentOrSuite }}
+                  }<br />
+                  {{ order.shippingAddress.city }}, {{ order.shippingAddress.stateOrProvince }} {{ order.shippingAddress.postalCode }}<br />
+                  {{ order.shippingAddress.country }}
                 </div>
-                <div class="col-md-4">
-                  <label class="form-label text-xs fw-semibold">City</label>
-                  <input type="text" class="form-control" formControlName="city" />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label text-xs fw-semibold">State / Province</label>
-                  <input type="text" class="form-control" formControlName="state" />
-                </div>
-                <div class="col-md-4">
-                  <label class="form-label text-xs fw-semibold">Postal / ZIP Code</label>
-                  <input type="text" class="form-control" formControlName="postalCode" />
+                <div class="text-muted text-xs">
+                  <i class="bi bi-telephone me-1"></i> {{ order.shippingAddress.phoneNumber }}
                 </div>
               </div>
             </div>
 
-            <!-- Payment Method Selection -->
+            <div class="card bg-white p-4 border rounded-4 shadow-xs">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                <i class="bi bi-credit-card me-2 text-primary-blue"></i> Payment Information
+              </h5>
+              <div class="text-sm">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="text-muted">Payment Method:</span>
+                  <strong class="text-navy text-capitalize">
+                    {{ order.paymentMethod === 'credit_card' ? 'Credit / Debit Card (Simulated)' : 'Cash on Delivery' }}
+                  </strong>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted">Payment Status:</span>
+                  <span class="badge" [class.bg-success-subtle]="order.paymentStatus === 'paid'" [class.text-success]="order.paymentStatus === 'paid'" [class.bg-warning-subtle]="order.paymentStatus === 'pending'" [class.text-warning]="order.paymentStatus === 'pending'">
+                    {{ order.paymentStatus === 'paid' ? 'PAID' : 'PENDING ON DELIVERY' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else if (items().length === 0) {
+      <!-- State 2: Empty Cart Guard -->
+      <div class="card bg-white p-5 text-center border rounded-4 shadow-xs my-4">
+        <i class="bi bi-bag-x text-muted" style="font-size: 3rem;"></i>
+        <h3 class="fw-bold text-navy mt-3 mb-2">Your Shopping Cart is Empty</h3>
+        <p class="text-muted mb-4 max-w-450 mx-auto">
+          Please add electronics and accessories to your shopping cart before proceeding with checkout.
+        </p>
+        <div>
+          <a routerLink="/products" class="btn btn-primary-blue px-4">
+            <i class="bi bi-grid me-1"></i> Browse Catalog
+          </a>
+        </div>
+      </div>
+    } @else {
+      <!-- State 3: Checkout Form -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 fw-bold text-navy mb-1">Checkout</h1>
+          <p class="text-muted text-sm mb-0">Complete your shipping and payment details below</p>
+        </div>
+        <a routerLink="/cart" class="btn btn-outline-navy btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Return to Cart
+        </a>
+      </div>
+
+      <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()" novalidate>
+        <div class="row g-4">
+          <!-- Left Column: Shipping & Payment Details -->
+          <div class="col-12 col-lg-8">
+            <!-- 1. Customer Information -->
+            <div class="card bg-white p-4 border rounded-3 mb-4 shadow-xs">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                <span class="step-badge">1</span>
+                <span>Customer Information</span>
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">First Name *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['firstName'].invalid && (f['firstName'].touched || f['firstName'].dirty)"
+                    formControlName="firstName"
+                    placeholder="Alex"
+                  />
+                  @if (f['firstName'].invalid && (f['firstName'].touched || f['firstName'].dirty)) {
+                    <div class="invalid-feedback text-xs">First name is required.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">Last Name *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['lastName'].invalid && (f['lastName'].touched || f['lastName'].dirty)"
+                    formControlName="lastName"
+                    placeholder="Vance"
+                  />
+                  @if (f['lastName'].invalid && (f['lastName'].touched || f['lastName'].dirty)) {
+                    <div class="invalid-feedback text-xs">Last name is required.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">Email Address *</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    [class.is-invalid]="f['email'].invalid && (f['email'].touched || f['email'].dirty)"
+                    formControlName="email"
+                    placeholder="alex@electrohub.io"
+                  />
+                  @if (f['email'].invalid && (f['email'].touched || f['email'].dirty)) {
+                    <div class="invalid-feedback text-xs">A valid email address is required.</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">Phone Number *</label>
+                  <input
+                    type="tel"
+                    class="form-control"
+                    [class.is-invalid]="f['phone'].invalid && (f['phone'].touched || f['phone'].dirty)"
+                    formControlName="phone"
+                    placeholder="+1 (555) 019-2834"
+                  />
+                  @if (f['phone'].invalid && (f['phone'].touched || f['phone'].dirty)) {
+                    <div class="invalid-feedback text-xs">A valid phone number is required.</div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Shipping Address -->
+            <div class="card bg-white p-4 border rounded-3 mb-4 shadow-xs">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                <span class="step-badge">2</span>
+                <span>Shipping Address</span>
+              </h5>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label text-xs fw-semibold text-navy">Street Address *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['streetAddress'].invalid && (f['streetAddress'].touched || f['streetAddress'].dirty)"
+                    formControlName="streetAddress"
+                    placeholder="742 Evergreen Terrace"
+                  />
+                  @if (f['streetAddress'].invalid && (f['streetAddress'].touched || f['streetAddress'].dirty)) {
+                    <div class="invalid-feedback text-xs">Street address is required (at least 5 characters).</div>
+                  }
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">Apartment, Suite, Unit (Optional)</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    formControlName="apartment"
+                    placeholder="Suite 4B"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label text-xs fw-semibold text-navy">City *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['city'].invalid && (f['city'].touched || f['city'].dirty)"
+                    formControlName="city"
+                    placeholder="San Francisco"
+                  />
+                  @if (f['city'].invalid && (f['city'].touched || f['city'].dirty)) {
+                    <div class="invalid-feedback text-xs">City is required.</div>
+                  }
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-xs fw-semibold text-navy">State / Province *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['state'].invalid && (f['state'].touched || f['state'].dirty)"
+                    formControlName="state"
+                    placeholder="CA"
+                  />
+                  @if (f['state'].invalid && (f['state'].touched || f['state'].dirty)) {
+                    <div class="invalid-feedback text-xs">State / Province is required.</div>
+                  }
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-xs fw-semibold text-navy">Postal / ZIP Code *</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    [class.is-invalid]="f['postalCode'].invalid && (f['postalCode'].touched || f['postalCode'].dirty)"
+                    formControlName="postalCode"
+                    placeholder="94107"
+                  />
+                  @if (f['postalCode'].invalid && (f['postalCode'].touched || f['postalCode'].dirty)) {
+                    <div class="invalid-feedback text-xs">Postal code is required.</div>
+                  }
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label text-xs fw-semibold text-navy">Country *</label>
+                  <select class="form-select" formControlName="country">
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Germany">Germany</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. Shipping Method -->
+            <div class="card bg-white p-4 border rounded-3 mb-4 shadow-xs">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                <span class="step-badge">3</span>
+                <span>Shipping Method</span>
+              </h5>
+              <div class="d-flex flex-column gap-3">
+                @for (opt of shippingOptions; track opt.id) {
+                  <label
+                    class="shipping-method-card p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer"
+                    [class.active-shipping]="selectedShippingMethodId() === opt.id"
+                    (click)="onShippingMethodChange(opt.id)"
+                  >
+                    <div class="d-flex align-items-center gap-3">
+                      <input
+                        type="radio"
+                        class="form-check-input"
+                        [value]="opt.id"
+                        formControlName="shippingMethod"
+                        [checked]="selectedShippingMethodId() === opt.id"
+                      />
+                      <div>
+                        <strong class="text-navy d-block">{{ opt.name }}</strong>
+                        <small class="text-muted">{{ opt.description }} ({{ opt.estimatedDays }})</small>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      @if (opt.id === 'standard') {
+                        @if (cartSubtotal() >= cartService.freeShippingThreshold) {
+                          <span class="badge bg-success-subtle text-success fw-bold">FREE</span>
+                        } @else {
+                          <span class="fw-bold text-navy">{{ cartService.standardShippingFee | currencyFormat }}</span>
+                        }
+                      } @else {
+                        <span class="fw-bold text-navy">{{ opt.cost | currencyFormat }}</span>
+                      }
+                    </div>
+                  </label>
+                }
+              </div>
+            </div>
+
+            <!-- 4. Payment Method -->
             <div class="card bg-white p-4 border rounded-3 shadow-xs">
-              <h5 class="fw-bold text-navy mb-3"><i class="bi bi-credit-card me-2 text-primary-blue"></i> Payment Method</h5>
-              <div class="d-flex flex-column gap-2">
-                <label class="payment-option p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer">
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom d-flex align-items-center gap-2">
+                <span class="step-badge">4</span>
+                <span>Payment Method</span>
+              </h5>
+              <div class="d-flex flex-column gap-3 mb-4">
+                <!-- Option 1: Credit / Debit Card -->
+                <label
+                  class="payment-option p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer"
+                  [class.active-payment]="checkoutForm.get('paymentMethod')?.value === 'credit_card'"
+                  (click)="onPaymentMethodChange('credit_card')"
+                >
                   <div class="d-flex align-items-center gap-3">
-                    <input type="radio" class="form-check-input" value="credit_card" formControlName="paymentMethod" />
+                    <input
+                      type="radio"
+                      class="form-check-input"
+                      value="credit_card"
+                      formControlName="paymentMethod"
+                    />
                     <div>
-                      <strong class="text-navy d-block">Credit / Debit Card</strong>
-                      <small class="text-muted">Instant processing with Visa, Mastercard, AMEX</small>
+                      <strong class="text-navy d-block">Credit / Debit Card (Simulated)</strong>
+                      <small class="text-muted">Instant mock processing for Visa, Mastercard, AMEX</small>
                     </div>
                   </div>
-                  <i class="bi bi-credit-card-2-back text-primary-blue fs-4"></i>
+                  <i class="bi bi-credit-card-2-front text-primary-blue fs-4"></i>
                 </label>
 
-                <label class="payment-option p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer">
+                <!-- Option 2: Cash on Delivery -->
+                <label
+                  class="payment-option p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer"
+                  [class.active-payment]="checkoutForm.get('paymentMethod')?.value === 'cash_on_delivery'"
+                  (click)="onPaymentMethodChange('cash_on_delivery')"
+                >
                   <div class="d-flex align-items-center gap-3">
-                    <input type="radio" class="form-check-input" value="paypal" formControlName="paymentMethod" />
-                    <div>
-                      <strong class="text-navy d-block">PayPal</strong>
-                      <small class="text-muted">Fast & safe digital wallet payment</small>
-                    </div>
-                  </div>
-                  <i class="bi bi-paypal text-primary fs-4"></i>
-                </label>
-
-                <label class="payment-option p-3 border rounded-3 d-flex align-items-center justify-content-between cursor-pointer">
-                  <div class="d-flex align-items-center gap-3">
-                    <input type="radio" class="form-check-input" value="cash_on_delivery" formControlName="paymentMethod" />
+                    <input
+                      type="radio"
+                      class="form-check-input"
+                      value="cash_on_delivery"
+                      formControlName="paymentMethod"
+                    />
                     <div>
                       <strong class="text-navy d-block">Cash on Delivery</strong>
                       <small class="text-muted">Pay in person upon inspection of hardware</small>
@@ -118,62 +419,130 @@
                   <i class="bi bi-cash-stack text-success fs-4"></i>
                 </label>
               </div>
+
+              <!-- Simulated Card Details Section (Shown when Credit Card is selected) -->
+              @if (checkoutForm.get('paymentMethod')?.value === 'credit_card') {
+                <div class="simulated-card-box p-3 border rounded-3 bg-light-subtle">
+                  <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-shield-check text-success"></i>
+                    <span class="text-xs text-muted">
+                      <strong>Demo Payment Simulation:</strong> Do not enter real credit card numbers. Any test digits work.
+                    </span>
+                  </div>
+                  <div class="row g-3">
+                    <div class="col-12">
+                      <label class="form-label text-xs fw-semibold text-navy">Name on Card</label>
+                      <input type="text" class="form-control" formControlName="cardholderName" placeholder="Alex Vance" />
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label text-xs fw-semibold text-navy">Card Number</label>
+                      <div class="input-group">
+                        <span class="input-group-text bg-white"><i class="bi bi-credit-card"></i></span>
+                        <input
+                          type="text"
+                          class="form-control border-start-0"
+                          formControlName="cardNumber"
+                          placeholder="4242 •••• •••• 4242"
+                          maxlength="19"
+                        />
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label text-xs fw-semibold text-navy">Expiration</label>
+                      <input type="text" class="form-control" formControlName="cardExpiry" placeholder="MM / YY" maxlength="5" />
+                    </div>
+                    <div class="col-6">
+                      <label class="form-label text-xs fw-semibold text-navy">CVC / CVV</label>
+                      <input type="password" class="form-control" formControlName="cardCvc" placeholder="•••" maxlength="4" />
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="alert alert-info py-2 px-3 text-xs mb-0 d-flex align-items-center gap-2">
+                  <i class="bi bi-info-circle-fill"></i>
+                  <span>You will pay the full amount upon arrival of your package. Please keep exact cash or card ready.</span>
+                </div>
+              }
             </div>
           </div>
 
-          <!-- Right Column: Review & Confirmation -->
+          <!-- Right Column: Order Summary & Placement -->
           <div class="col-12 col-lg-4">
             <div class="card bg-white p-4 border rounded-3 shadow-xs sticky-top" style="top: 100px;">
-              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">Items in Order ({{ items().length }})</h5>
+              <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">
+                Order Summary ({{ items().length }})
+              </h5>
 
-              <!-- Mini items review list -->
+              <!-- Mini items list -->
               <div class="checkout-items-preview mb-3">
                 @for (item of items(); track item.id) {
                   <div class="d-flex align-items-center justify-content-between py-2 border-bottom text-xs">
                     <div class="d-flex align-items-center gap-2">
-                      <span class="badge bg-light text-navy border">{{ item.quantity }}x</span>
-                      <span class="text-navy text-truncate" style="max-width: 170px;">{{ item.product.name }}</span>
+                      <img [src]="item.product.featuredImage" [alt]="item.product.name" class="mini-thumb rounded border" />
+                      <div>
+                        <span class="text-navy text-truncate d-block fw-semibold" style="max-width: 150px;">
+                          {{ item.product.name }}
+                        </span>
+                        <span class="text-muted text-xs">Qty: {{ item.quantity }}</span>
+                      </div>
                     </div>
                     <span class="fw-bold text-navy">{{ item.totalPrice | currencyFormat }}</span>
                   </div>
                 }
               </div>
 
-              <!-- Cost breakdown -->
+              <!-- Cost Breakdown -->
               <div class="d-flex justify-content-between text-sm mb-2">
                 <span class="text-muted">Subtotal</span>
-                <span class="fw-semibold text-navy">{{ summary().subtotal | currencyFormat }}</span>
+                <span class="fw-semibold text-navy">{{ cartSubtotal() | currencyFormat }}</span>
               </div>
               <div class="d-flex justify-content-between text-sm mb-2">
                 <span class="text-muted">Shipping</span>
-                @if (summary().shipping === 0) {
+                @if (currentShippingCost() === 0) {
                   <span class="text-success fw-bold">FREE</span>
                 } @else {
-                  <span class="fw-semibold text-navy">{{ summary().shipping | currencyFormat }}</span>
+                  <span class="fw-semibold text-navy">{{ currentShippingCost() | currencyFormat }}</span>
                 }
               </div>
               <div class="d-flex justify-content-between text-sm mb-3">
-                <span class="text-muted">Taxes (8%)</span>
-                <span class="fw-semibold text-navy">{{ summary().tax | currencyFormat }}</span>
+                <span class="text-muted">Estimated Tax (8%)</span>
+                <span class="fw-semibold text-navy">{{ currentTax() | currencyFormat }}</span>
               </div>
 
               <div class="d-flex justify-content-between align-items-center pt-3 border-top mb-4">
-                <span class="fw-bold fs-5 text-navy">Order Total</span>
-                <span class="fw-extrabold fs-4 text-primary-blue">{{ summary().total | currencyFormat }}</span>
+                <div>
+                  <span class="fw-bold fs-5 text-navy">Order Total</span>
+                  <span class="d-block text-xs text-muted">All fees included</span>
+                </div>
+                <span class="fw-extrabold fs-4 text-primary-blue">{{ currentTotal() | currencyFormat }}</span>
               </div>
 
+              <!-- Submit Button -->
               <button
                 type="submit"
-                class="btn btn-primary-blue btn-lg w-100"
+                class="btn btn-primary-blue btn-lg w-100 mb-3 d-flex align-items-center justify-content-center gap-2"
                 [disabled]="isSubmitting()"
               >
                 @if (isSubmitting()) {
-                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                  Processing Order...
+                  <span class="spinner-border spinner-border-sm" role="status"></span>
+                  <span>Processing Order...</span>
                 } @else {
-                  <i class="bi bi-lock-fill me-1"></i> Complete & Place Order
+                  <i class="bi bi-shield-lock-fill"></i>
+                  <span>Complete & Place Order</span>
                 }
               </button>
+
+              <!-- Security Trust Seals -->
+              <div class="pt-3 border-top text-xs text-muted d-flex flex-column gap-2">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-shield-check text-success fs-6"></i>
+                  <span>256-Bit SSL Encrypted Checkout</span>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-truck text-primary-blue fs-6"></i>
+                  <span>Tracked delivery with automated updates</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

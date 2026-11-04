@@ -4,7 +4,7 @@ import { Address } from '../models/address.model';
 import { CartSummary } from '../models/cart.model';
 import { StorageService } from './storage.service';
 
-const ORDERS_STORAGE_KEY = 'electrohub_orders_history';
+export const ORDERS_STORAGE_KEY = 'electrohub_orders_history';
 
 @Injectable({
   providedIn: 'root',
@@ -14,18 +14,28 @@ export class OrderService {
 
   private readonly _orders = signal<Order[]>([]);
 
-  // Readonly access
+  // Readonly access for components
   readonly orders = this._orders.asReadonly();
 
   constructor() {
     this.loadFromStorage();
 
+    // Auto-sync order history to LocalStorage
     effect(() => {
       this.storage.setItem(ORDERS_STORAGE_KEY, this._orders());
     });
+
+    // Cross-tab synchronization
+    if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+      window.addEventListener('storage', (event: StorageEvent) => {
+        if (event.key === ORDERS_STORAGE_KEY) {
+          this.loadFromStorage();
+        }
+      });
+    }
   }
 
-  private loadFromStorage(): void {
+  loadFromStorage(): void {
     const saved = this.storage.getItem<Order[]>(ORDERS_STORAGE_KEY);
     if (saved && Array.isArray(saved) && saved.length > 0) {
       this._orders.set(saved);
@@ -43,17 +53,17 @@ export class OrderService {
               productId: 'prod-macbook-pro-16',
               productName: 'Apple MacBook Pro 16" M3 Max',
               productImage: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=400&q=80',
-              unitPrice: 3499.00,
+              unitPrice: 3499.0,
               quantity: 1,
-              lineTotal: 3499.00,
+              lineTotal: 3499.0,
             },
             {
               productId: 'prod-sony-wh1000xm5',
               productName: 'Sony WH-1000XM5 Wireless ANC',
               productImage: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80',
-              unitPrice: 348.00,
+              unitPrice: 348.0,
               quantity: 1,
-              lineTotal: 348.00,
+              lineTotal: 348.0,
             },
           ],
           shippingAddress: {
@@ -81,11 +91,12 @@ export class OrderService {
           paymentMethod: 'credit_card',
           paymentStatus: 'paid',
           status: 'shipped',
-          subtotal: 2849.98,
+          shippingMethod: 'Express Delivery (1-2 Days)',
+          subtotal: 3847.0,
           shippingCost: 0,
-          tax: 227.99,
+          tax: 307.76,
           discount: 0,
-          total: 3077.97,
+          total: 4154.76,
           trackingNumber: 'TRK-9821034-US',
           estimatedDelivery: '2026-11-08T18:00:00Z',
           createdAt: '2026-11-01T14:32:00Z',
@@ -93,11 +104,16 @@ export class OrderService {
         },
       ];
       this._orders.set(initialOrders);
+      this.saveToStorage();
     }
   }
 
+  private saveToStorage(): void {
+    this.storage.setItem(ORDERS_STORAGE_KEY, this._orders());
+  }
+
   /**
-   * Places a new order from checkout details
+   * Places a new order from checkout details and persists to LocalStorage
    */
   placeOrder(
     userId: string,
@@ -107,10 +123,11 @@ export class OrderService {
     shippingAddress: Address,
     billingAddress: Address,
     paymentMethod: PaymentMethod,
-    summary: CartSummary
+    summary: CartSummary,
+    shippingMethod = 'Standard Express Delivery'
   ): Order {
     const timestamp = Date.now();
-    const orderNumber = `EH-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const orderNumber = `EH-2026-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const newOrder: Order = {
       id: `ord-${timestamp}`,
@@ -122,19 +139,22 @@ export class OrderService {
       shippingAddress,
       billingAddress,
       paymentMethod,
-      paymentStatus: 'paid',
+      paymentStatus: paymentMethod === 'cash_on_delivery' ? 'pending' : 'paid',
       status: 'processing',
+      shippingMethod,
       subtotal: summary.subtotal,
       shippingCost: summary.shipping,
       tax: summary.tax,
       discount: summary.discount,
       total: summary.total,
       trackingNumber: `TRK-${Math.floor(1000000 + Math.random() * 9000000)}`,
+      estimatedDelivery: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
     this._orders.update((prev) => [newOrder, ...prev]);
+    this.saveToStorage();
     return newOrder;
   }
 
@@ -143,6 +163,13 @@ export class OrderService {
    */
   getOrderById(id: string): Order | undefined {
     return this._orders().find((o) => o.id === id);
+  }
+
+  /**
+   * Retrieve single order by Order Number
+   */
+  getOrderByNumber(orderNumber: string): Order | undefined {
+    return this._orders().find((o) => o.orderNumber === orderNumber);
   }
 
   /**
@@ -161,6 +188,7 @@ export class OrderService {
           : o
       )
     );
+    this.saveToStorage();
     return true;
   }
 }

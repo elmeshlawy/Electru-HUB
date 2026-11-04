@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../core/services/order.service';
@@ -18,6 +18,17 @@ export class OrdersComponent {
 
   readonly orders = this.orderService.orders;
 
+  expandedOrderId = signal<string | null>(null);
+  feedbackMessage = signal<string | null>(null);
+
+  toggleOrderDetails(orderId: string): void {
+    this.expandedOrderId.update((curr) => (curr === orderId ? null : orderId));
+  }
+
+  isExpanded(orderId: string): boolean {
+    return this.expandedOrderId() === orderId;
+  }
+
   getStatusBadgeClass(status: OrderStatus): string {
     switch (status) {
       case 'delivered':
@@ -36,8 +47,10 @@ export class OrdersComponent {
   }
 
   cancelOrder(orderId: string): void {
-    if (confirm('Are you sure you want to cancel this order?')) {
-      this.orderService.cancelOrder(orderId);
+    const success = this.orderService.cancelOrder(orderId);
+    if (success) {
+      this.feedbackMessage.set('Order has been successfully cancelled.');
+      setTimeout(() => this.feedbackMessage.set(null), 3500);
     }
   }
 }

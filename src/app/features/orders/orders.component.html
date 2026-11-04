@@ -1,5 +1,6 @@
 <div class="orders-page py-4">
   <div class="container-xl">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -7,13 +8,30 @@
       </ol>
     </nav>
 
-    <h1 class="h3 fw-bold text-navy mb-4">My Orders</h1>
+    <!-- Page Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="h3 fw-bold text-navy mb-1">My Orders</h1>
+        <p class="text-muted text-sm mb-0">Track and manage your past ElectroHub equipment purchases</p>
+      </div>
+      <a routerLink="/products" class="btn btn-outline-navy btn-sm">
+        <i class="bi bi-cart me-1"></i> Shop More Tech
+      </a>
+    </div>
+
+    <!-- Feedback Message Banner -->
+    @if (feedbackMessage(); as msg) {
+      <div class="alert alert-info py-2 px-3 text-sm mb-4 d-flex align-items-center gap-2 rounded-3 shadow-xs" role="alert">
+        <i class="bi bi-info-circle-fill"></i>
+        <span>{{ msg }}</span>
+      </div>
+    }
 
     @if (orders().length > 0) {
       <div class="d-flex flex-column gap-4">
         @for (order of orders(); track order.id) {
           <div class="card bg-white border rounded-4 overflow-hidden shadow-xs">
-            <!-- Header bar -->
+            <!-- Order Header Bar -->
             <div class="card-header bg-light border-bottom p-3 d-flex flex-wrap justify-content-between align-items-center gap-3">
               <div class="d-flex flex-wrap align-items-center gap-4 text-xs">
                 <div>
@@ -22,7 +40,7 @@
                 </div>
                 <div>
                   <span class="text-muted d-block">Order #</span>
-                  <strong class="text-navy">{{ order.orderNumber }}</strong>
+                  <strong class="text-primary-blue">{{ order.orderNumber }}</strong>
                 </div>
                 <div>
                   <span class="text-muted d-block">Total Amount</span>
@@ -50,19 +68,25 @@
               </div>
             </div>
 
-            <!-- Body items -->
+            <!-- Order Body Items -->
             <div class="card-body p-4">
               <div class="d-flex flex-column gap-3 mb-3">
                 @for (item of order.items; track item.productId) {
                   <div class="d-flex align-items-center justify-content-between py-2 border-bottom">
                     <div class="d-flex align-items-center gap-3">
-                      <img
-                        [src]="item.productImage"
-                        [alt]="item.productName"
-                        class="order-item-thumb rounded border"
-                      />
+                      <a [routerLink]="['/products', item.productId]">
+                        <img
+                          [src]="item.productImage"
+                          [alt]="item.productName"
+                          class="order-item-thumb rounded border"
+                        />
+                      </a>
                       <div>
-                        <h6 class="text-navy fw-semibold mb-1">{{ item.productName }}</h6>
+                        <h6 class="text-navy fw-semibold mb-1 text-sm">
+                          <a [routerLink]="['/products', item.productId]" class="text-navy text-decoration-none hover-blue">
+                            {{ item.productName }}
+                          </a>
+                        </h6>
                         <span class="text-muted text-xs">
                           Qty: {{ item.quantity }} &times; {{ item.unitPrice | currencyFormat }}
                         </span>
@@ -73,32 +97,93 @@
                 }
               </div>
 
-              <!-- Tracking / Meta Info -->
-              <div class="d-flex flex-wrap justify-content-between align-items-center text-xs text-muted pt-2">
-                @if (order.trackingNumber) {
-                  <div>
-                    <i class="bi bi-truck text-primary-blue me-1"></i> Tracking Number:
-                    <strong class="text-navy">{{ order.trackingNumber }}</strong>
-                  </div>
-                }
-                @if (order.estimatedDelivery) {
-                  <div>
-                    <i class="bi bi-calendar-check text-success me-1"></i> Estimated Delivery:
-                    <strong class="text-navy">{{ order.estimatedDelivery | date:'mediumDate' }}</strong>
-                  </div>
-                }
+              <!-- Tracking / Shipping Meta Info -->
+              <div class="d-flex flex-wrap justify-content-between align-items-center text-xs text-muted pt-2 border-top">
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                  @if (order.trackingNumber) {
+                    <div>
+                      <i class="bi bi-truck text-primary-blue me-1"></i> Tracking:
+                      <strong class="text-navy">{{ order.trackingNumber }}</strong>
+                    </div>
+                  }
+                  @if (order.estimatedDelivery) {
+                    <div>
+                      <i class="bi bi-calendar-check text-success me-1"></i> Arrival:
+                      <strong class="text-navy">{{ order.estimatedDelivery | date:'mediumDate' }}</strong>
+                    </div>
+                  }
+                </div>
+
+                <!-- Toggle Full Details Action -->
+                <button
+                  type="button"
+                  class="btn btn-link btn-sm text-primary-blue text-decoration-none p-0 text-xs mt-2 mt-sm-0"
+                  (click)="toggleOrderDetails(order.id)"
+                >
+                  <i class="bi" [class.bi-chevron-down]="!isExpanded(order.id)" [class.bi-chevron-up]="isExpanded(order.id)"></i>
+                  <span class="ms-1">{{ isExpanded(order.id) ? 'Hide Details' : 'View Full Details' }}</span>
+                </button>
               </div>
+
+              <!-- Expanded Details Section -->
+              @if (isExpanded(order.id)) {
+                <div class="expanded-details-box mt-3 pt-3 border-top bg-light-subtle p-3 rounded-3">
+                  <div class="row g-3 text-xs">
+                    <div class="col-12 col-md-4">
+                      <strong class="text-navy d-block mb-1">Delivery Address</strong>
+                      <div class="text-muted">
+                        {{ order.shippingAddress.fullName }}<br />
+                        {{ order.shippingAddress.streetAddress }}
+                        @if (order.shippingAddress.apartmentOrSuite) {
+                          , {{ order.shippingAddress.apartmentOrSuite }}
+                        }<br />
+                        {{ order.shippingAddress.city }}, {{ order.shippingAddress.stateOrProvince }} {{ order.shippingAddress.postalCode }}<br />
+                        {{ order.shippingAddress.country }}<br />
+                        Phone: {{ order.shippingAddress.phoneNumber }}
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <strong class="text-navy d-block mb-1">Shipping & Payment Method</strong>
+                      <div class="text-muted">
+                        <div>Method: <strong>{{ order.shippingMethod || 'Standard Delivery' }}</strong></div>
+                        <div class="mt-1">Payment: <strong>{{ order.paymentMethod === 'credit_card' ? 'Credit / Debit Card (Simulated)' : 'Cash on Delivery' }}</strong></div>
+                        <div class="mt-1">Payment Status: <span class="badge bg-success-subtle text-success">{{ order.paymentStatus | uppercase }}</span></div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                      <strong class="text-navy d-block mb-1">Cost Breakdown</strong>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Subtotal:</span>
+                        <span class="text-navy">{{ order.subtotal | currencyFormat }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Shipping:</span>
+                        <span class="text-navy">{{ order.shippingCost === 0 ? 'FREE' : (order.shippingCost | currencyFormat) }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted">Tax (8%):</span>
+                        <span class="text-navy">{{ order.tax | currencyFormat }}</span>
+                      </div>
+                      <div class="d-flex justify-content-between pt-1 border-top fw-bold text-sm">
+                        <span class="text-navy">Total:</span>
+                        <span class="text-primary-blue">{{ order.total | currencyFormat }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
             </div>
           </div>
         }
       </div>
     } @else {
-      <div class="bg-white rounded-3 border p-5">
+      <!-- Empty State -->
+      <div class="bg-white rounded-3 border p-5 text-center shadow-xs">
         <app-empty-state
           icon="bi-box-seam"
           title="No Orders Found"
           description="You haven't placed any tech orders with ElectroHub yet."
-          actionText="Start Shopping"
+          actionText="Browse Electronics Catalog"
           actionRoute="/products"
         ></app-empty-state>
       </div>
