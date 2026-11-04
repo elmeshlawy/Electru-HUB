@@ -1,5 +1,6 @@
 <div class="profile-page py-4">
   <div class="container-xl">
+    <!-- Breadcrumb -->
     <nav aria-label="breadcrumb" class="mb-3">
       <ol class="breadcrumb text-xs">
         <li class="breadcrumb-item"><a routerLink="/" class="text-decoration-none">Home</a></li>
@@ -25,6 +26,7 @@
               {{ u.role }} Account
             </span>
 
+            <!-- Stats Bar -->
             <div class="d-flex justify-content-center gap-3 border-top pt-3 text-xs text-muted mb-4">
               <div>
                 <strong class="text-navy d-block fs-6">{{ orders().length }}</strong>
@@ -37,35 +39,163 @@
               </div>
             </div>
 
+            <!-- Quick Navigation Actions -->
             <div class="d-grid gap-2">
-              <a routerLink="/orders" class="btn btn-outline-navy btn-sm">
-                <i class="bi bi-box-seam me-1"></i> Order History
+              <a routerLink="/orders" class="btn btn-outline-navy btn-sm d-flex align-items-center justify-content-center gap-1">
+                <i class="bi bi-box-seam"></i>
+                <span>Order History</span>
               </a>
-              <a routerLink="/wishlist" class="btn btn-outline-navy btn-sm">
-                <i class="bi bi-heart me-1"></i> Wishlist
+              <a routerLink="/wishlist" class="btn btn-outline-navy btn-sm d-flex align-items-center justify-content-center gap-1">
+                <i class="bi bi-heart"></i>
+                <span>Saved Wishlist</span>
               </a>
-              <button type="button" class="btn btn-link text-danger btn-sm text-decoration-none" (click)="onLogout()">
+              <button
+                type="button"
+                class="btn btn-link text-danger btn-sm text-decoration-none mt-2"
+                (click)="onLogout()"
+              >
                 <i class="bi bi-box-arrow-right me-1"></i> Sign Out
               </button>
             </div>
           </div>
         </div>
 
-        <!-- Saved Addresses & Profile Details -->
+        <!-- Main Content Area -->
         <div class="col-12 col-lg-8">
+          <!-- Notification Banners -->
+          @if (successMessage(); as msg) {
+            <div class="alert alert-success py-2 px-3 text-sm mb-3 d-flex align-items-center gap-2 rounded-3 shadow-xs" role="alert">
+              <i class="bi bi-check-circle-fill"></i>
+              <span>{{ msg }}</span>
+            </div>
+          }
+          @if (errorMessage(); as err) {
+            <div class="alert alert-danger py-2 px-3 text-sm mb-3 d-flex align-items-center gap-2 rounded-3 shadow-xs" role="alert">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>{{ err }}</span>
+            </div>
+          }
+
+          <!-- User Information & Edit Profile Card -->
           <div class="card bg-white p-4 border rounded-4 shadow-xs mb-4">
             <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-              <h5 class="fw-bold text-navy mb-0">Delivery Addresses</h5>
-              <button class="btn btn-primary-blue btn-sm">
-                <i class="bi bi-plus-lg me-1"></i> Add Address
-              </button>
+              <div>
+                <h5 class="fw-bold text-navy mb-0">Personal Information</h5>
+                <small class="text-muted text-xs">Manage your contact details and account information</small>
+              </div>
+              @if (!isEditing()) {
+                <button type="button" class="btn btn-outline-navy btn-sm d-flex align-items-center gap-1" (click)="startEditing()">
+                  <i class="bi bi-pencil-square"></i>
+                  <span>Edit Profile</span>
+                </button>
+              }
+            </div>
+
+            @if (!isEditing()) {
+              <!-- Display Mode -->
+              <div class="row g-3">
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">First Name</span>
+                  <span class="fw-medium text-navy">{{ u.firstName }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">Last Name</span>
+                  <span class="fw-medium text-navy">{{ u.lastName }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">Email Address</span>
+                  <span class="fw-medium text-navy">{{ u.email }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">Phone Number</span>
+                  <span class="fw-medium text-navy">{{ u.phone || 'Not provided' }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">Member Since</span>
+                  <span class="fw-medium text-navy">{{ u.createdAt | date:'mediumDate' }}</span>
+                </div>
+                <div class="col-sm-6">
+                  <span class="text-xs text-muted text-uppercase fw-semibold d-block">Account Status</span>
+                  <span class="badge bg-success-subtle text-success">Active Customer</span>
+                </div>
+              </div>
+            } @else {
+              <!-- Edit Form Mode -->
+              <form [formGroup]="profileForm" (ngSubmit)="saveProfile()" novalidate>
+                <div class="row g-3 mb-3">
+                  <div class="col-sm-6">
+                    <label class="form-label text-xs fw-semibold text-navy">First Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="firstName"
+                      placeholder="First Name"
+                    />
+                    @if (profileForm.get('firstName')?.invalid && profileForm.get('firstName')?.touched) {
+                      <div class="text-danger text-xs mt-1">First name is required.</div>
+                    }
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label text-xs fw-semibold text-navy">Last Name</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      formControlName="lastName"
+                      placeholder="Last Name"
+                    />
+                    @if (profileForm.get('lastName')?.invalid && profileForm.get('lastName')?.touched) {
+                      <div class="text-danger text-xs mt-1">Last name is required.</div>
+                    }
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label text-xs fw-semibold text-navy">Email Address</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      formControlName="email"
+                      placeholder="name@example.com"
+                    />
+                    @if (profileForm.get('email')?.invalid && profileForm.get('email')?.touched) {
+                      <div class="text-danger text-xs mt-1">Valid email address is required.</div>
+                    }
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label text-xs fw-semibold text-navy">Phone Number</label>
+                    <input
+                      type="tel"
+                      class="form-control"
+                      formControlName="phone"
+                      placeholder="+1 (555) 000-0000"
+                    />
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                  <button type="button" class="btn btn-light btn-sm" (click)="cancelEditing()">
+                    Cancel
+                  </button>
+                  <button type="submit" class="btn btn-primary-blue btn-sm">
+                    <i class="bi bi-check-lg me-1"></i> Save Changes
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+
+          <!-- Saved Delivery Addresses -->
+          <div class="card bg-white p-4 border rounded-4 shadow-xs mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+              <div>
+                <h5 class="fw-bold text-navy mb-0">Delivery Addresses</h5>
+                <small class="text-muted text-xs">Primary shipping and billing locations</small>
+              </div>
             </div>
 
             @if (u.addresses.length > 0) {
               <div class="row g-3">
                 @for (addr of u.addresses; track addr.id) {
                   <div class="col-12 col-md-6">
-                    <div class="address-card p-3 border rounded-3 position-relative h-100">
+                    <div class="address-card p-3 border rounded-3 position-relative h-100 bg-light-subtle">
                       @if (addr.isDefaultShipping) {
                         <span class="badge bg-success-subtle text-success position-absolute top-0 end-0 m-2 text-xs">
                           Default Shipping
@@ -85,38 +215,44 @@
                 }
               </div>
             } @else {
-              <p class="text-muted text-sm mb-0">No addresses on file. Add one to speed up checkout.</p>
+              <p class="text-muted text-sm mb-0">No addresses on file. Add one during checkout.</p>
             }
           </div>
 
-          <!-- Account Security -->
+          <!-- Security & System Notice -->
           <div class="card bg-white p-4 border rounded-4 shadow-xs">
-            <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">Security & Preferences</h5>
+            <h5 class="fw-bold text-navy mb-3 pb-2 border-bottom">System & Security Information</h5>
             <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
               <div>
-                <strong class="text-navy d-block text-sm">Two-Factor Authentication</strong>
-                <small class="text-muted">Protect your account with an extra verification layer</small>
+                <strong class="text-navy d-block text-sm">Demo Authentication Mode</strong>
+                <small class="text-muted">Session and profile state are safely stored in LocalStorage</small>
               </div>
-              <span class="badge bg-secondary-subtle text-secondary">Disabled</span>
+              <span class="badge bg-primary-subtle text-primary-blue">Active Session</span>
             </div>
             <div class="d-flex justify-content-between align-items-center py-2">
               <div>
-                <strong class="text-navy d-block text-sm">Email Notifications</strong>
-                <small class="text-muted">Receive order shipping updates and tracking alerts</small>
+                <strong class="text-navy d-block text-sm">Encrypted Storage</strong>
+                <small class="text-muted">Passwords are never stored or logged in plain text</small>
               </div>
-              <div class="form-check form-switch mb-0">
-                <input class="form-check-input" type="checkbox" checked />
-              </div>
+              <span class="badge bg-success-subtle text-success">Protected</span>
             </div>
           </div>
         </div>
       </div>
     } @else {
-      <div class="card bg-white p-5 border rounded-3 text-center">
-        <h4 class="fw-bold text-navy mb-2">Not Signed In</h4>
-        <p class="text-muted mb-4">Please log in to manage your ElectroHub account and track your orders.</p>
+      <!-- Unauthenticated State -->
+      <div class="card bg-white p-5 border rounded-3 text-center shadow-xs">
+        <div class="display-5 text-primary-blue mb-3">
+          <i class="bi bi-lock-fill"></i>
+        </div>
+        <h4 class="fw-bold text-navy mb-2">Sign In Required</h4>
+        <p class="text-muted mb-4 max-w-450 mx-auto">
+          Please sign in to access your personal profile, order history, and account settings.
+        </p>
         <div>
-          <a routerLink="/auth/login" class="btn btn-primary-blue">Sign In</a>
+          <a routerLink="/auth/login" class="btn btn-primary-blue px-4">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+          </a>
         </div>
       </div>
     }

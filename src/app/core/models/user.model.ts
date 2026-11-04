@@ -1,4 +1,5 @@
 import { Address } from './address.model';
+export type { Address };
 
 export type UserRole = 'customer' | 'admin';
 

@@ -3,6 +3,7 @@
     <div class="row justify-content-center">
       <div class="col-12 col-sm-10 col-md-8 col-lg-6">
         <div class="card bg-white p-4 p-md-5 border rounded-4 shadow-sm">
+          <!-- Header -->
           <div class="text-center mb-4">
             <div class="brand-icon-box mx-auto mb-3">
               <i class="bi bi-cpu-fill"></i>
@@ -11,41 +12,199 @@
             <p class="text-muted text-sm">Join ElectroHub for exclusive access to premier tech launches</p>
           </div>
 
-          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-            <div class="row g-3 mb-3">
-              <div class="col-sm-6">
-                <label class="form-label text-xs fw-semibold text-navy">First Name</label>
-                <input type="text" class="form-control" formControlName="firstName" placeholder="Alex" />
-              </div>
-              <div class="col-sm-6">
-                <label class="form-label text-xs fw-semibold text-navy">Last Name</label>
-                <input type="text" class="form-control" formControlName="lastName" placeholder="Vance" />
-              </div>
+          <!-- Demo Notification Banner -->
+          <div class="alert alert-info py-2 px-3 text-xs mb-4 rounded-3 d-flex align-items-start gap-2 shadow-xs">
+            <i class="bi bi-info-circle-fill text-primary-blue mt-0.5 fs-6"></i>
+            <div>
+              <strong>Demo Authentication:</strong> Frontend-only registration with simulated persistence. Passwords are securely hashed.
             </div>
+          </div>
 
+          <!-- Error Alert -->
+          @if (errorMessage(); as err) {
+            <div class="alert alert-danger py-2 px-3 text-sm mb-3 d-flex align-items-center gap-2 rounded-3 shadow-xs" role="alert">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>{{ err }}</span>
+            </div>
+          }
+
+          <!-- Registration Form -->
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" novalidate>
+            <!-- Full Name -->
             <div class="mb-3">
-              <label class="form-label text-xs fw-semibold text-navy">Email Address</label>
-              <input type="email" class="form-control" formControlName="email" placeholder="alex@electrohub.io" />
+              <label for="regFullName" class="form-label text-xs fw-semibold text-navy">Full Name</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-person"></i>
+                </span>
+                <input
+                  id="regFullName"
+                  type="text"
+                  class="form-control border-start-0 ps-1"
+                  [class.is-invalid]="fullNameControl?.invalid && (fullNameControl?.touched || fullNameControl?.dirty)"
+                  formControlName="fullName"
+                  placeholder="e.g. Alex Vance"
+                  autocomplete="name"
+                />
+              </div>
+              @if (fullNameControl?.invalid && (fullNameControl?.touched || fullNameControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (fullNameControl?.errors?.['required']) {
+                    Full name is required.
+                  } @else if (fullNameControl?.errors?.['minlength']) {
+                    Full name must be at least 3 characters.
+                  }
+                </div>
+              }
             </div>
 
+            <!-- Email Address -->
+            <div class="mb-3">
+              <label for="regEmail" class="form-label text-xs fw-semibold text-navy">Email Address</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-envelope"></i>
+                </span>
+                <input
+                  id="regEmail"
+                  type="email"
+                  class="form-control border-start-0 ps-1"
+                  [class.is-invalid]="emailControl?.invalid && (emailControl?.touched || emailControl?.dirty)"
+                  formControlName="email"
+                  placeholder="alex@electrohub.io"
+                  autocomplete="email"
+                />
+              </div>
+              @if (emailControl?.invalid && (emailControl?.touched || emailControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (emailControl?.errors?.['required']) {
+                    Email address is required.
+                  } @else if (emailControl?.errors?.['email']) {
+                    Please enter a valid email address.
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Password -->
+            <div class="mb-3">
+              <label for="regPassword" class="form-label text-xs fw-semibold text-navy">Password (Minimum 8 chars)</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-lock"></i>
+                </span>
+                <input
+                  id="regPassword"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  class="form-control border-start-0 border-end-0 ps-1"
+                  [class.is-invalid]="passwordControl?.invalid && (passwordControl?.touched || passwordControl?.dirty)"
+                  formControlName="password"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  class="input-group-text bg-light text-muted border-start-0 btn-toggle-pw"
+                  (click)="togglePasswordVisibility()"
+                  [title]="showPassword() ? 'Hide password' : 'Show password'"
+                  aria-label="Toggle password visibility"
+                >
+                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+                </button>
+              </div>
+              @if (passwordControl?.invalid && (passwordControl?.touched || passwordControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (passwordControl?.errors?.['required']) {
+                    Password is required.
+                  } @else if (passwordControl?.errors?.['minlength']) {
+                    Password must be at least 8 characters long.
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="mb-3">
+              <label for="regConfirmPassword" class="form-label text-xs fw-semibold text-navy">Confirm Password</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light text-muted border-end-0">
+                  <i class="bi bi-shield-check"></i>
+                </span>
+                <input
+                  id="regConfirmPassword"
+                  [type]="showConfirmPassword() ? 'text' : 'password'"
+                  class="form-control border-start-0 border-end-0 ps-1"
+                  [class.is-invalid]="(confirmPasswordControl?.invalid || hasPasswordMismatch) && (confirmPasswordControl?.touched || confirmPasswordControl?.dirty)"
+                  formControlName="confirmPassword"
+                  placeholder="••••••••"
+                  autocomplete="new-password"
+                />
+                <button
+                  type="button"
+                  class="input-group-text bg-light text-muted border-start-0 btn-toggle-pw"
+                  (click)="toggleConfirmPasswordVisibility()"
+                  [title]="showConfirmPassword() ? 'Hide password' : 'Show password'"
+                  aria-label="Toggle confirm password visibility"
+                >
+                  <i class="bi" [class.bi-eye]="!showConfirmPassword()" [class.bi-eye-slash]="showConfirmPassword()"></i>
+                </button>
+              </div>
+              @if (confirmPasswordControl?.invalid && (confirmPasswordControl?.touched || confirmPasswordControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (confirmPasswordControl?.errors?.['required']) {
+                    Please confirm your password.
+                  }
+                </div>
+              } @else if (hasPasswordMismatch) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  Passwords do not match.
+                </div>
+              }
+            </div>
+
+            <!-- Terms Acceptance -->
             <div class="mb-4">
-              <label class="form-label text-xs fw-semibold text-navy">Password (Minimum 8 chars)</label>
-              <input type="password" class="form-control" formControlName="password" placeholder="••••••••" />
+              <div class="form-check">
+                <input
+                  id="acceptTermsCheck"
+                  type="checkbox"
+                  class="form-check-input"
+                  [class.is-invalid]="acceptTermsControl?.invalid && (acceptTermsControl?.touched || acceptTermsControl?.dirty)"
+                  formControlName="acceptTerms"
+                />
+                <label for="acceptTermsCheck" class="form-check-label text-xs text-muted">
+                  I agree to ElectroHub's <span class="text-primary-blue">Terms of Service</span> and <span class="text-primary-blue">Privacy Policy</span>.
+                </label>
+              </div>
+              @if (acceptTermsControl?.invalid && (acceptTermsControl?.touched || acceptTermsControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  You must accept the terms to create an account.
+                </div>
+              }
             </div>
 
-            <button type="submit" class="btn btn-primary-blue w-100 py-2 mb-3" [disabled]="isLoading()">
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary-blue w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2"
+              [disabled]="isLoading()"
+            >
               @if (isLoading()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                Creating Profile...
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                <span>Creating Profile...</span>
               } @else {
-                Create Account
+                <span>Create Account</span>
+                <i class="bi bi-person-plus"></i>
               }
             </button>
           </form>
 
-          <div class="text-center text-xs text-muted">
+          <!-- Footer Switch to Login -->
+          <div class="text-center text-xs text-muted pt-2 border-top">
             Already have an ElectroHub account?
-            <a routerLink="/auth/login" class="text-primary-blue fw-semibold text-decoration-none ms-1">Sign In</a>
+            <a routerLink="/auth/login" class="text-primary-blue fw-semibold text-decoration-none ms-1">
+              Sign In
+            </a>
           </div>
         </div>
       </div>

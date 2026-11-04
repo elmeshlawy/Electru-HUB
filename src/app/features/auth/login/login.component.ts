@@ -13,17 +13,59 @@ import { AuthService } from '../../../core/services/auth.service';
 })
 export class LoginComponent {
   private readonly fb = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
+  readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
   isLoading = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
+  showPassword = signal<boolean>(false);
 
   loginForm: FormGroup = this.fb.group({
-    email: ['alex.vance@electrohub.io', [Validators.required, Validators.email]],
-    password: ['TechSecure2026!', [Validators.required, Validators.minLength(6)]],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
   });
+
+  // Getter helpers for template validation
+  get emailControl() {
+    return this.loginForm.get('email');
+  }
+
+  get passwordControl() {
+    return this.loginForm.get('password');
+  }
+
+  togglePasswordVisibility(): void {
+    this.showPassword.update((val) => !val);
+  }
+
+  /**
+   * Fills demo account credentials into the form
+   */
+  fillDemoCredentials(): void {
+    this.loginForm.patchValue({
+      email: 'alex.vance@electrohub.io',
+      password: 'TechSecure2026!',
+    });
+    this.errorMessage.set(null);
+  }
+
+  /**
+   * Immediately signs in as the demo user
+   */
+  loginWithDemoAccount(): void {
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
+    const result = this.authService.loginAsDemoUser();
+    this.isLoading.set(false);
+
+    if (result.success) {
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/profile';
+      this.router.navigateByUrl(returnUrl);
+    } else {
+      this.errorMessage.set('Could not sign in with demo account.');
+    }
+  }
 
   onSubmit(): void {
     if (this.loginForm.invalid) {
@@ -34,15 +76,16 @@ export class LoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    const { email } = this.loginForm.value;
-    const success = this.authService.login(email);
+    const { email, password } = this.loginForm.value;
+    const result = this.authService.login(email, password);
 
-    if (success) {
+    this.isLoading.set(false);
+
+    if (result.success) {
       const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/profile';
       this.router.navigateByUrl(returnUrl);
     } else {
-      this.errorMessage.set('Invalid credentials provided.');
+      this.errorMessage.set(result.message || 'Invalid credentials provided.');
     }
-    this.isLoading.set(false);
   }
 }

@@ -3,6 +3,7 @@
     <div class="row justify-content-center">
       <div class="col-12 col-sm-10 col-md-8 col-lg-5">
         <div class="card bg-white p-4 p-md-5 border rounded-4 shadow-sm">
+          <!-- Header -->
           <div class="text-center mb-4">
             <div class="brand-icon-box mx-auto mb-3">
               <i class="bi bi-cpu-fill"></i>
@@ -11,59 +12,134 @@
             <p class="text-muted text-sm">Sign in to your ElectroHub account</p>
           </div>
 
-          @if (errorMessage()) {
-            <div class="alert alert-danger py-2 text-sm mb-3">
-              {{ errorMessage() }}
+          <!-- Demo Notification Banner -->
+          <div class="alert alert-info py-2 px-3 text-xs mb-4 rounded-3 d-flex align-items-start gap-2 shadow-xs">
+            <i class="bi bi-info-circle-fill text-primary-blue mt-0.5 fs-6"></i>
+            <div>
+              <strong>Demo Authentication:</strong> Frontend-only simulated session with LocalStorage persistence. Passwords are securely hashed.
+              <div class="mt-1">
+                Demo Account: <code>alex.vance&#64;electrohub.io</code> / <code>TechSecure2026!</code>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          @if (errorMessage(); as err) {
+            <div class="alert alert-danger py-2 px-3 text-sm mb-3 d-flex align-items-center gap-2 rounded-3 shadow-xs" role="alert">
+              <i class="bi bi-exclamation-triangle-fill"></i>
+              <span>{{ err }}</span>
             </div>
           }
 
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <!-- Login Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+            <!-- Email Field -->
             <div class="mb-3">
-              <label class="form-label text-xs fw-semibold text-navy">Email Address</label>
+              <label for="loginEmail" class="form-label text-xs fw-semibold text-navy">Email Address</label>
               <div class="input-group">
                 <span class="input-group-text bg-light text-muted border-end-0">
                   <i class="bi bi-envelope"></i>
                 </span>
                 <input
+                  id="loginEmail"
                   type="email"
                   class="form-control border-start-0 ps-1"
+                  [class.is-invalid]="emailControl?.invalid && (emailControl?.touched || emailControl?.dirty)"
                   formControlName="email"
                   placeholder="name@example.com"
+                  autocomplete="email"
                 />
               </div>
+              @if (emailControl?.invalid && (emailControl?.touched || emailControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (emailControl?.errors?.['required']) {
+                    Email address is required.
+                  } @else if (emailControl?.errors?.['email']) {
+                    Please enter a valid email address (e.g. name&#64;example.com).
+                  }
+                </div>
+              }
             </div>
 
+            <!-- Password Field -->
             <div class="mb-4">
               <div class="d-flex justify-content-between align-items-center mb-1">
-                <label class="form-label text-xs fw-semibold text-navy mb-0">Password</label>
-                <a href="#forgot" class="text-xs text-primary-blue text-decoration-none">Forgot password?</a>
+                <label for="loginPassword" class="form-label text-xs fw-semibold text-navy mb-0">Password</label>
+                <button
+                  type="button"
+                  class="btn btn-link p-0 text-xs text-primary-blue text-decoration-none"
+                  (click)="fillDemoCredentials()"
+                >
+                  Fill Demo Password
+                </button>
               </div>
               <div class="input-group">
                 <span class="input-group-text bg-light text-muted border-end-0">
                   <i class="bi bi-lock"></i>
                 </span>
                 <input
-                  type="password"
-                  class="form-control border-start-0 ps-1"
+                  id="loginPassword"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  class="form-control border-start-0 border-end-0 ps-1"
+                  [class.is-invalid]="passwordControl?.invalid && (passwordControl?.touched || passwordControl?.dirty)"
                   formControlName="password"
                   placeholder="••••••••"
+                  autocomplete="current-password"
                 />
+                <button
+                  type="button"
+                  class="input-group-text bg-light text-muted border-start-0 btn-toggle-pw"
+                  (click)="togglePasswordVisibility()"
+                  [title]="showPassword() ? 'Hide password' : 'Show password'"
+                  aria-label="Toggle password visibility"
+                >
+                  <i class="bi" [class.bi-eye]="!showPassword()" [class.bi-eye-slash]="showPassword()"></i>
+                </button>
               </div>
+              @if (passwordControl?.invalid && (passwordControl?.touched || passwordControl?.dirty)) {
+                <div class="invalid-feedback d-block text-xs mt-1">
+                  @if (passwordControl?.errors?.['required']) {
+                    Password is required.
+                  } @else if (passwordControl?.errors?.['minlength']) {
+                    Password must be at least 6 characters long.
+                  }
+                </div>
+              }
             </div>
 
-            <button type="submit" class="btn btn-primary-blue w-100 py-2 mb-3" [disabled]="isLoading()">
+            <!-- Sign In Button -->
+            <button
+              type="submit"
+              class="btn btn-primary-blue w-100 py-2 mb-3 d-flex align-items-center justify-content-center gap-2"
+              [disabled]="isLoading()"
+            >
               @if (isLoading()) {
-                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-                Signing In...
+                <span class="spinner-border spinner-border-sm" role="status"></span>
+                <span>Signing In...</span>
               } @else {
-                Sign In
+                <span>Sign In</span>
+                <i class="bi bi-box-arrow-in-right"></i>
               }
+            </button>
+
+            <!-- One-Click Demo Login Helper -->
+            <button
+              type="button"
+              class="btn btn-outline-navy w-100 py-2 mb-3 text-xs d-flex align-items-center justify-content-center gap-2"
+              (click)="loginWithDemoAccount()"
+              [disabled]="isLoading()"
+            >
+              <i class="bi bi-lightning-charge-fill text-warning"></i>
+              <span>One-Click Sign In (Alex Vance Demo)</span>
             </button>
           </form>
 
-          <div class="text-center text-xs text-muted">
-            Don't have an account yet?
-            <a routerLink="/auth/register" class="text-primary-blue fw-semibold text-decoration-none ms-1">Create Account</a>
+          <!-- Footer Switch to Register -->
+          <div class="text-center text-xs text-muted pt-2 border-top">
+            Don't have an ElectroHub account yet?
+            <a routerLink="/auth/register" class="text-primary-blue fw-semibold text-decoration-none ms-1">
+              Create Account
+            </a>
           </div>
         </div>
       </div>
